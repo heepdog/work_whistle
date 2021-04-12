@@ -1,5 +1,6 @@
 #include "alerts.h"
-#include <Arduinojson.h>
+#include "ArduinoJson.h"
+#include "Arduino.h"
 
 
 Alert::Alert(){
@@ -55,14 +56,19 @@ int Alert::getDuration(){
     return this->duration;
 }
 
+int Alert::getMinutes(){
+    return minutes_in_day;
+}
+
 int Alert::operator<(const Alert RHSAlert)  {
+
     return (this->minutes_in_day < RHSAlert.minutes_in_day);
 }
 int Alert::operator>(const Alert RHSAlert)  {
-    return (this->minutes_in_day < RHSAlert.minutes_in_day);
+    return (this->minutes_in_day > RHSAlert.minutes_in_day);
 }
-int Alert::operator=(const Alert RHSAlert)  {
-    return (this->minutes_in_day < RHSAlert.minutes_in_day);
+int Alert::operator==(const Alert RHSAlert)  {
+    return (this->minutes_in_day == RHSAlert.minutes_in_day);
 }
 
 AlertTone Alert::getTone(){
@@ -88,7 +94,8 @@ Schedule::Schedule(const JsonObject  jsonalerts){
     for(int i= 0; i < number_of_alerts; i++){
         addAlert(Alert(jsonalerts["alerts"][i].as<JsonObject>()));
     }
-    // std::sort(vectorAlerts.begin(),vectorAlerts.end(),alertbefore);
+    std::sort(vectorAlerts.begin(),vectorAlerts.end(),alertbefore);
+
 }
 int Schedule::addAlert(const String* time, int durration, AlertTone tone){
 
@@ -137,8 +144,9 @@ Schedule::~Schedule(){}
 
 void Schedule::debugPrintTimes(){
 
-    for(int i = 0;i < vectorAlerts.size(); i++){
-        Serial.println(*vectorAlerts[i].getTime() + " " + vectorAlerts[i].get_minutes_in_day());
+    Serial.println("name: " + name);
+    for(size_t i = 0;i < vectorAlerts.size(); i++){
+        Serial.println(*vectorAlerts[i].getTime()); // + " " + vectorAlerts[i].get_minutes_in_day());
     }
 
 }

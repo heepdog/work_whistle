@@ -1,6 +1,7 @@
 // #include <StandardCplusplus.h>
-#include <Arduinojson.h>
+#include "ArduinoJson.h"
 // #include <set>
+#include <Arduino.h>
 
 enum AlertTone{ PULSE, SINGLE };
 
@@ -12,8 +13,8 @@ class Alert{
         Alert(JsonObject jsonAlert);
         ~Alert();
         const String* getTime(); // returns the char 24:00 time of the alert 24hr
-        int getHour();  // returns the interger of the alert
-        int getMinute(); // returs the minute of the alert
+        int getHours();  // returns the interger of the alert
+        int getMinutes(); // returs the minute of the alert
         int getDuration();  // sets how long the alert should last
         AlertTone getTone();  //sets how the alert tone should sound
         int setId(int id); 
@@ -22,7 +23,7 @@ class Alert{
         int setTone(const AlertTone tone);
         int operator<(const Alert testAlert) ;
         int operator>(const Alert testAlert) ;
-        int operator=(const Alert testAlert) ;
+        int operator==(const Alert testAlert) ;
         int get_minutes_in_day();
         
 
@@ -71,3 +72,11 @@ class Schedule{
         
 
 };
+
+
+struct {
+  std::vector<Schedule> schedules;
+  std::vector<Schedule>::iterator operator[](const char* test){return schedules.begin();};
+  std::vector<Schedule>::iterator operator[](const int test){return schedules.begin()+test;};
+  void addSchedule(Schedule data){schedules.push_back(data);};
+}Schedules;
