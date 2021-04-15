@@ -41,7 +41,7 @@ class Alert{
 
 struct {
     bool operator()(Alert a, Alert b) { return a < b; }
-} alertbefore;
+} AlertSort;
 
 
 class Schedule{
@@ -76,7 +76,19 @@ class Schedule{
 
 struct {
   std::vector<Schedule> schedules;
-  std::vector<Schedule>::iterator operator[](const char* test){return schedules.begin();};
+  std::vector<Schedule>::iterator operator[](const char* test){
+      std::vector<Schedule>::iterator returnValue= schedules.begin();
+      size_t index = 0;
+      while(index < schedules.size()){
+          if (strcmp(schedules[index].getName()->c_str(),test)==0){
+              return schedules.begin()+index;
+              }
+              index++;
+      };
+        return (std::vector<Schedule>::iterator)NULL;
+
+      };
   std::vector<Schedule>::iterator operator[](const int test){return schedules.begin()+test;};
   void addSchedule(Schedule data){schedules.push_back(data);};
+  void Print(){for( size_t i = 0; i < schedules.size();i++ ){schedules[i].debugPrintTimes();}}
 }Schedules;

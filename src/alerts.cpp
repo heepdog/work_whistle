@@ -87,6 +87,7 @@ Schedule::Schedule(){
         alertCount = 0;
         id = 0;
 }
+
 Schedule::Schedule(const JsonObject  jsonalerts){ 
 
     name = jsonalerts["name"].as<String>();
@@ -94,7 +95,7 @@ Schedule::Schedule(const JsonObject  jsonalerts){
     for(int i= 0; i < number_of_alerts; i++){
         addAlert(Alert(jsonalerts["alerts"][i].as<JsonObject>()));
     }
-    std::sort(vectorAlerts.begin(),vectorAlerts.end(),alertbefore);
+    std::sort(vectorAlerts.begin(),vectorAlerts.end(), AlertSort);
 
 }
 int Schedule::addAlert(const String* time, int durration, AlertTone tone){

@@ -17,10 +17,10 @@
 #include "alerts.h"
 ////////////////////////////////////////////////////////
 
-// #define SSID            F("heatmor-guest")
-// #define SSIDPWD         F("")
-#define SSID            F("heppners-2")
-#define SSIDPWD         F("Cannotcrackit")
+#define SSID            F("heatmor-guest")
+#define SSIDPWD         F("")
+// #define SSID            F("heppners-2")
+// #define SSIDPWD         F("Cannotcrackit")
 
 
 
@@ -46,8 +46,12 @@ void setup() {
   //Alert test = Alert(doc[F("Schedules")][0][F("alerts")][1].as<JsonObject>());
 
   // Schedules.schedules.push_back(Schedule(doc[F("Schedules")][0].as<JsonObject>()));
-  Schedules.addSchedule(Schedule(doc[F("Schedules")][0].as<JsonObject>()));
-  Schedules.addSchedule(Schedule(doc[F("Schedules")][1].as<JsonObject>()));
+  int numberSchedules = doc[F("Schedules")].size();
+  
+  for( int i = 0; i < numberSchedules; i++){
+    Schedules.addSchedule(Schedule(doc[F("Schedules")][i].as<JsonObject>()));
+  }
+  // Schedules.addSchedule(Schedule(doc[F("Schedules")][1].as<JsonObject>()));
   // Serial.println(doc[F("Schedules")][0][F("alerts")].size());
   // Serial.println(test.getTone());
   // Serial.println(test.getDuration());
@@ -67,8 +71,16 @@ void testTime();
 
 void loop() {
 
-    Schedules["test"]->debugPrintTimes();
-    Schedules[1]->debugPrintTimes();
+  static time_t nextTime = 0;
+  tnow = time(nullptr);
+
+  if((localtime(&tnow)->tm_sec == 0) && (tnow > nextTime)){
+    nextTime = tnow+60;
+  
+
+    Schedules["Morning overtime"]->debugPrintTimes();
+    // Schedules[1]->debugPrintTimes();
+    // Schedules.Print();
 
 		Serial.println ();
     
@@ -80,14 +92,20 @@ void loop() {
     Serial.printf("free: %5d - max: %5d - frag: %3d%% <- ", free, max, frag);
     gettimeofday(&tv, nullptr);
 
-    tnow = time(nullptr);
+    //tnow = time(nullptr);
     printTm ((const char*)F("   localtime"), localtime (&tnow));
     Serial.println();
     printf ((const char*)F(" local asctime: %s"), asctime (localtime (&tnow)));	// print formated local time
     Serial.println();
 
 	
-	delay (60000);
+  }
+ 	delay (1000);
+  String printTime = asctime (localtime (&tnow));
+  printTime.trim();
+  // printf ((const char*)F("local asctime: %s"), asctime (localtime (&tnow)));	// print formated local time
+  Serial.print("test ");
+  Serial.print(printTime);
 }
 
 // void testTime(){
