@@ -6,10 +6,12 @@ bool cbtime_set = false;
 timeval cbtime;
 
 
-void time_is_set(void) {
+void time_is_set(void) { 
         gettimeofday(&cbtime, NULL);
         cbtime_set = true;
+        Serial.print("\e[20;0H");
         Serial.println("------------------ settimeofday() was called ------------------");
+        Serial.print("\e[0:0H");
     }
 
 void setup_timezones(void){

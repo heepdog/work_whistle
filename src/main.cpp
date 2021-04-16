@@ -17,10 +17,10 @@
 #include "alerts.h"
 ////////////////////////////////////////////////////////
 
-#define SSID            F("heatmor-guest")
-#define SSIDPWD         F("")
-// #define SSID            F("heppners-2")
-// #define SSIDPWD         F("Cannotcrackit")
+// #define SSID            F("heatmor-guest")
+// #define SSIDPWD         F("")
+#define SSID            F("heppners-2")
+#define SSIDPWD         F("Cannotcrackit")
 
 
 
@@ -40,22 +40,11 @@ void setup() {
   deserializeJson(doc, file);
   file.close();
  
-  Serial.println("nopanack\n");
-  // serializeJsonPretty(doc,Serial);
-
-  //Alert test = Alert(doc[F("Schedules")][0][F("alerts")][1].as<JsonObject>());
-
-  // Schedules.schedules.push_back(Schedule(doc[F("Schedules")][0].as<JsonObject>()));
   int numberSchedules = doc[F("Schedules")].size();
   
   for( int i = 0; i < numberSchedules; i++){
     Schedules.addSchedule(Schedule(doc[F("Schedules")][i].as<JsonObject>()));
   }
-  // Schedules.addSchedule(Schedule(doc[F("Schedules")][1].as<JsonObject>()));
-  // Serial.println(doc[F("Schedules")][0][F("alerts")].size());
-  // Serial.println(test.getTone());
-  // Serial.println(test.getDuration());
-  // Serial.println(*test.getTime());
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, SSIDPWD);
 
@@ -71,13 +60,15 @@ void testTime();
 
 void loop() {
 
-  static time_t nextTime = 0;
+  static time_t nextMinute = 0;
+  static time_t nextSecond = 0;
   tnow = time(nullptr);
 
-  if((localtime(&tnow)->tm_sec == 0) && (tnow > nextTime)){
-    nextTime = tnow+60;
+  if((localtime(&tnow)->tm_sec == 0) && (tnow >= nextMinute)){
+    nextMinute = tnow + 60;
   
-
+    MoveCursorToLine(2);
+    CSFromCursorDown();
     Schedules["Morning overtime"]->debugPrintTimes();
     // Schedules[1]->debugPrintTimes();
     // Schedules.Print();
@@ -89,23 +80,24 @@ void loop() {
     uint8_t frag;
     ESP.getHeapStats(&free, &max, &frag);
 
-    Serial.printf("free: %5d - max: %5d - frag: %3d%% <- ", free, max, frag);
-    gettimeofday(&tv, nullptr);
+    Serial.printf("free: %5d - max: %5d - frag: %3d%% <- \n\r", free, max, frag);
+    // gettimeofday(&tv, nullptr);
+    Serial.print(asctime (localtime (&tnow)));
 
-    //tnow = time(nullptr);
-    printTm ((const char*)F("   localtime"), localtime (&tnow));
-    Serial.println();
-    printf ((const char*)F(" local asctime: %s"), asctime (localtime (&tnow)));	// print formated local time
-    Serial.println();
+    MoveCursorToLine(1);
 
-	
   }
- 	delay (1000);
-  String printTime = asctime (localtime (&tnow));
-  printTime.trim();
-  // printf ((const char*)F("local asctime: %s"), asctime (localtime (&tnow)));	// print formated local time
-  Serial.print("test ");
-  Serial.print(printTime);
+
+ 	if( tnow >= nextSecond ){
+     nextSecond = tnow + 1;
+    //  delay (1000);
+    // String printTime = asctime (localtime (&tnow));
+    // printTime.trim();
+    MoveCursorToLine(1);
+    ClearLineAtCursor();
+
+    Serial.print(asctime (localtime (&tnow)));
+   }
 }
 
 // void testTime(){
@@ -139,7 +131,12 @@ void loop() {
 //     ESP.getHeapStats(&free, &max, &frag);
 
 //     Serial.printf("free: %5d - max: %5d - frag: %3d%% <- ", free, max, frag);
-//     Serial.println();
+//     Serial.println();    //tnow = time(nullptr);
+    // printTm ((const char*)F("   localtime"), localtime (&tnow));
+    // Serial.println();
+    // printf ((const char*)F(" local asctime: %s"), asctime (localtime (&tnow)));	// print formated local time
+    // Serial.println();
+
 
 //   }
 //   }
