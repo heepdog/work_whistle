@@ -37,6 +37,10 @@ int Alert::setId(int id){
     this->id = id;
     return true;
 }
+
+int Alert::getId(){
+    return this->id;
+}
 int Alert::setTime(const String* time){
     this->time =  *time;
     int colon_index = time->indexOf(":");
@@ -70,6 +74,9 @@ int Alert::operator>(const Alert RHSAlert)  {
 int Alert::operator==(const Alert RHSAlert)  {
     return (this->minutes_in_day == RHSAlert.minutes_in_day);
 }
+int Alert::operator==(const char* RHSAlert)  {
+    return (strcmp(this->getTime()->c_str(),RHSAlert) == 0);
+}
 
 AlertTone Alert::getTone(){
    return this->tone;
@@ -90,10 +97,14 @@ Schedule::Schedule(){
 
 Schedule::Schedule(const JsonObject  jsonalerts){ 
 
+    id = jsonalerts["id"].as<int>();
+    if (id == 0) {id = vectorAlerts.size();}
     name = jsonalerts["name"].as<String>();
     int number_of_alerts = jsonalerts["alerts"].size();
     for(int i= 0; i < number_of_alerts; i++){
-        addAlert(Alert(jsonalerts["alerts"][i].as<JsonObject>()));
+        Alert tmp = Alert(jsonalerts["alerts"][i].as<JsonObject>());
+        if(tmp.getId() == 0 ) tmp.setId(5);
+        addAlert(tmp);
     }
     std::sort(vectorAlerts.begin(),vectorAlerts.end(), AlertSort);
 
@@ -101,6 +112,7 @@ Schedule::Schedule(const JsonObject  jsonalerts){
 int Schedule::addAlert(const String* time, int durration, AlertTone tone){
 
     vectorAlerts.push_back(Alert(vectorAlerts.size()+1 , time, durration, tone));
+    alertCount++;
 
     return 1;
 
@@ -145,7 +157,7 @@ Schedule::~Schedule(){}
 
 void Schedule::debugPrintTimes(){
 
-    Serial.println("name: " + name);
+    Serial.println("name: \"" + name + "\" ;  id = "  + id);
     for(size_t i = 0;i < vectorAlerts.size(); i++){
         Serial.println(*vectorAlerts[i].getTime()); // + " " + vectorAlerts[i].get_minutes_in_day());
     }

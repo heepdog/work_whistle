@@ -49,7 +49,7 @@ void setup() {
   WiFi.begin(SSID, SSIDPWD);
 
   setup_timezones();
-
+  ClearScreen();
 
 }
 
@@ -97,6 +97,8 @@ void loop() {
     ClearLineAtCursor();
 
     Serial.print(asctime (localtime (&tnow)));
+    Serial.print(Schedules.HasName("Main"));
+    Serial.print(Schedules.HasName("toast"));
    }
 }
 

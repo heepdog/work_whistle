@@ -17,6 +17,7 @@ class Alert{
         int getMinutes(); // returs the minute of the alert
         int getDuration();  // sets how long the alert should last
         AlertTone getTone();  //sets how the alert tone should sound
+        int getId();
         int setId(int id); 
         int setTime(const String* time);
         int setDuration(int duration);
@@ -24,6 +25,7 @@ class Alert{
         int operator<(const Alert testAlert) ;
         int operator>(const Alert testAlert) ;
         int operator==(const Alert testAlert) ;
+        int operator==(const char* searchTime) ;
         int get_minutes_in_day();
         
 
@@ -48,18 +50,23 @@ class Schedule{
     public:
         Schedule();
         Schedule(JsonObject const jsonAlert);
-
+        int getId(){return id;};
+        void setId(int newID){id = newID;};
         int addAlert(Alert);
         int addAlert(const String* time, int durration, AlertTone tone);
         int removeAlert(int index);
         int modifyAlert(int index, int durration, AlertTone tone);
         const String* GetAlertTime(int index);
         AlertTone getAlertTone(int index);
-        int getAlertDuration(int index);
+        int getAlertDuration(int index); 
         String* getName();
         int validAlert(int index);
         void debugPrintTimes();
+        int operator== (const char* RHS){ return strcmp(name.c_str(),RHS)==0;}
         ~Schedule();
+        int alertAtTime(const char* currentTime){
+            return std::find(vectorAlerts.begin(),vectorAlerts.end(),currentTime)==vectorAlerts.end();
+            };
         
     private:
         int alertCount;
@@ -67,28 +74,35 @@ class Schedule{
         String name;
         // Alert alerts[ 15*sizeof( Alert )];
         std::vector<Alert> vectorAlerts;
-        // std::array<Alert,15> arrayAlerts;
-        //use std::sort for the array
-        
-
+        // std::array<Alert,1<std::vector<Schedule>,
 };
 
 
 struct {
   std::vector<Schedule> schedules;
-  std::vector<Schedule>::iterator operator[](const char* test){
-      std::vector<Schedule>::iterator returnValue= schedules.begin();
-      size_t index = 0;
-      while(index < schedules.size()){
-          if (strcmp(schedules[index].getName()->c_str(),test)==0){
-              return schedules.begin()+index;
-              }
-              index++;
-      };
-        return (std::vector<Schedule>::iterator)NULL;
+  std::vector<Schedule>::iterator operator[](const char* schdName){
+      return std::find<std::vector<Schedule>::iterator>(schedules.begin(),schedules.end(),schdName);
+    //   std::vector<Schedule>::iterator returnValue= schedules.begin();
+    //   size_t index = 0;
+    //   while(index < schedules.size()){
+    //       if (strcmp(schedules[index].getName()->c_str(),test)==0){
+    //           return schedules.begin()+index;
+    //           }
+    //           index++;
+    //   };
+    //     return (std::vector<Schedule>::iterator)NULL;
 
       };
   std::vector<Schedule>::iterator operator[](const int test){return schedules.begin()+test;};
-  void addSchedule(Schedule data){schedules.push_back(data);};
+  bool addSchedule(Schedule data){
+      if (HasName(data.getName()->c_str())) return false;
+      if (data.getId() == 0) data.setId(schedules.size()+1);
+      schedules.push_back(data);
+      return true;};
   void Print(){for( size_t i = 0; i < schedules.size();i++ ){schedules[i].debugPrintTimes();}}
+  bool HasName(const char * searchname){
+      return std::find<std::vector<Schedule>::iterator>(schedules.begin(),schedules.end(),searchname) != schedules.end();
+
+  }
+
 }Schedules;

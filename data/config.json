@@ -20,7 +20,7 @@
             {"id":8,"time":"15:00","duration":3,"tone":"single"}
         ]
         },
-        {"id":2, "name":"Morning overtime","alerts":[
+        {"name":"Morning overtime","alerts":[
             {"id":1,"time":"5:00","duration":6,"tone":"pulse"},
             {"id":2,"time":"7:45","duration":3,"tone":"single"}
         ]

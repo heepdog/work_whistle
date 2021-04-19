@@ -18,7 +18,7 @@
   Serial.print("\e[J");    // clear screen from cursor down
 
 #define ClearScreen() \
-  serial.print("\e[J2");  // Clear Entire screen
+  Serial.print("\e[J2");  // Clear Entire screen
 
 
 void printTm(const char* what, const tm* tm);
