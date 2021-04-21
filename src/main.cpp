@@ -22,7 +22,7 @@
 #define SSID            F("heppners-2")
 #define SSIDPWD         F("Cannotcrackit")
 
-
+StaticJsonDocument<2500> doc;
 
 void setup() {
   Serial.begin(115200);
@@ -35,7 +35,7 @@ void setup() {
 
   LittleFS.begin();
 
-  StaticJsonDocument<2500> doc;
+  // StaticJsonDocument<2500> doc;
   File file = LittleFS.open(F("/config.json"),"r");
   deserializeJson(doc, file);
   file.close();
@@ -45,6 +45,13 @@ void setup() {
   for( int i = 0; i < numberSchedules; i++){
     Schedules.addSchedule(Schedule(doc[F("Schedules")][i].as<JsonObject>()));
   }
+
+  for( int day = 0 ; day < 7; day++){
+    for( size_t item = 0; item < doc[F("days")][day]["schedule"].size(); item++){
+      dailyList[day].AddSchedule(doc[F("days")][day]["schedule"][item].as<JsonObject>());
+    }
+  }
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, SSIDPWD);
 
@@ -69,7 +76,7 @@ void loop() {
   
     MoveCursorToLine(2);
     CSFromCursorDown();
-    Schedules["Morning overtime"]->debugPrintTimes();
+    // Schedules["Morning overtime"]->debugPrintTimes();
     // Schedules[1]->debugPrintTimes();
     // Schedules.Print();
 
@@ -82,6 +89,12 @@ void loop() {
 
     Serial.printf("free: %5d - max: %5d - frag: %3d%% <- \n\r", free, max, frag);
     // gettimeofday(&tv, nullptr);
+
+    for( int i = 0 ; i < 7; i++){
+      dailyList[i].print();
+    }
+
+
     Serial.print(asctime (localtime (&tnow)));
 
     MoveCursorToLine(1);
@@ -97,8 +110,8 @@ void loop() {
     ClearLineAtCursor();
 
     Serial.print(asctime (localtime (&tnow)));
-    Serial.print(Schedules.HasName("Main"));
-    Serial.print(Schedules.HasName("toast"));
+    // Serial.print(Schedules.HasName("Main"));
+    // Serial.print(Schedules.HasName("toast"));
    }
 }
 

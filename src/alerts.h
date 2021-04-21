@@ -106,3 +106,41 @@ struct {
   }
 
 }Schedules;
+
+class ScheduleItems{
+    private:
+    String name;
+    bool isrepeating;
+
+    public:
+    String* getName() {return &name;};
+    bool getRepeating() {return isrepeating;}; 
+    void setName(const String* newname){this->name = *newname; };
+    void setRepeating(const bool repeat);
+
+    ScheduleItems(){name= ""; isrepeating = 0;};
+    ScheduleItems(JsonObject const jsonAlert){
+        name = jsonAlert["Name"].as<String>(); 
+        isrepeating = jsonAlert["repeat"];
+    };
+    void print(){Serial.printf("name: %s, repeating %d\n", name.c_str(), isrepeating);}
+
+};
+
+struct{
+
+    // std::vector<ScheduleItems> list;
+    ScheduleItems list[10];
+    size_t listsize=0;
+
+    // void AddSchedule(ScheduleItems item){list.push_back(item);};
+    // void AddSchedule(JsonObject const jsonAlert){list.push_back(ScheduleItems(jsonAlert));};
+    // void print(){for (size_t i = 0; i < list.size(); i++){list[i].print();}}
+    
+    void AddSchedule(ScheduleItems item){list[listsize] = item;listsize++;};
+    void AddSchedule(JsonObject const jsonAlert){list[listsize] = (ScheduleItems(jsonAlert));listsize++;};
+    void print(){Serial.println("Next List -> "); for (size_t i = 0; i < listsize; i++){list[i].print();}}
+
+
+}dailyList[7];
+

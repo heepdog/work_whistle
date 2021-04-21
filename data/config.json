@@ -1,12 +1,12 @@
 {
     "days":[
-        {"name":"Sunday","abbreviation":"sun","schedule":[null], "wday":0},
-        {"name":"Monday","abbreviation":"mon","schedule":[{"id":1,"repeat":1}], "wday":1},
-        {"name":"Tuesday","abbreviation":"tue","schedule":[{"id":1,"repeat":1}], "wday":2},
-        {"name":"Wednesday","abbreviation":"wed","schedule":[{"id":1,"repeat":1}], "wday":3},
-        {"name":"Thursday","abbreviation":"thu","schedule":[{"id":1,"repeat":1}], "wday":4},
-        {"name":"Friday","abbreviation":"fri","schedule":[{"id":1,"repeat":1},{"id":2,"repeat":0},{"id":3,"repeat":1}], "wday":5},
-        {"name":"Saturday","abbreviation":"sat","schedule":[null], "wday":6}
+        {"name":"Sunday","abbreviation":"sun","schedule":[], "wday":0},
+        {"name":"Monday","abbreviation":"mon","schedule":[{"Name":"Main","repeat":1}], "wday":1},
+        {"name":"Tuesday","abbreviation":"tue","schedule":[{"Name":"Main","repeat":1}], "wday":2},
+        {"name":"Wednesday","abbreviation":"wed","schedule":[{"Name":"Main","repeat":1}], "wday":3},
+        {"name":"Thursday","abbreviation":"thu","schedule":[{"Name":"Main","repeat":1}], "wday":4},
+        {"name":"Friday","abbreviation":"fri","schedule":[{"Name":"Main","repeat":1},{"Name":"Morning overtime","repeat":0},{"Name":"Evening overtime","repeat":1}], "wday":5},
+        {"name":"Saturday","abbreviation":"sat","schedule":[], "wday":6}
     ],
     "Schedules":[
         {"id":1, "name":"Main","alerts":[
