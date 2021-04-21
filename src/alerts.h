@@ -132,6 +132,7 @@ struct{
     // std::vector<ScheduleItems> list;
     ScheduleItems list[10];
     size_t listsize=0;
+    String dayName;
 
     // void AddSchedule(ScheduleItems item){list.push_back(item);};
     // void AddSchedule(JsonObject const jsonAlert){list.push_back(ScheduleItems(jsonAlert));};
@@ -139,7 +140,7 @@ struct{
     
     void AddSchedule(ScheduleItems item){list[listsize] = item;listsize++;};
     void AddSchedule(JsonObject const jsonAlert){list[listsize] = (ScheduleItems(jsonAlert));listsize++;};
-    void print(){Serial.println("Next List -> "); for (size_t i = 0; i < listsize; i++){list[i].print();}}
+    void print(){Serial.printf("Next List -> %s\n",dayName.c_str()); for (size_t i = 0; i < listsize; i++){Serial.print("\t");list[i].print();}}
 
 
 }dailyList[7];

@@ -17,10 +17,10 @@
 #include "alerts.h"
 ////////////////////////////////////////////////////////
 
-// #define SSID            F("heatmor-guest")
-// #define SSIDPWD         F("")
-#define SSID            F("heppners-2")
-#define SSIDPWD         F("Cannotcrackit")
+#define SSID            F("heatmor-guest")
+#define SSIDPWD         F("")
+// #define SSID            F("heppners-2")
+// #define SSIDPWD         F("Cannotcrackit")
 
 StaticJsonDocument<2500> doc;
 
@@ -47,6 +47,7 @@ void setup() {
   }
 
   for( int day = 0 ; day < 7; day++){
+    dailyList[day].dayName =  doc[F("days")][day]["name"].as<String>();
     for( size_t item = 0; item < doc[F("days")][day]["schedule"].size(); item++){
       dailyList[day].AddSchedule(doc[F("days")][day]["schedule"][item].as<JsonObject>());
     }
