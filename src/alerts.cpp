@@ -110,8 +110,13 @@ Schedule::Schedule(const JsonObject  jsonalerts){
 
 }
 int Schedule::addAlert(const String* time, int durration, AlertTone tone){
-
-    vectorAlerts.push_back(Alert(vectorAlerts.size()+1 , time, durration, tone));
+    Alert tmp;
+    tmp.setTime(time);
+    tmp.setDuration(durration);
+    tmp.setTone(tone);
+    tmp.setId(vectorAlerts.size() + 1);
+    // vectorAlerts.push_back(Alert(vectorAlerts.size()+1 , time, durration, tone));
+    vectorAlerts.push_back(tmp);
     alertCount++;
 
     return 1;
@@ -159,7 +164,8 @@ void Schedule::debugPrintTimes(){
 
     Serial.println("name: \"" + name + "\" ;  id = "  + id);
     for(size_t i = 0;i < vectorAlerts.size(); i++){
-        Serial.println(*vectorAlerts[i].getTime()); // + " " + vectorAlerts[i].get_minutes_in_day());
+        Serial.println("TIME: " +*vectorAlerts[i].getTime()+ " " + vectorAlerts[i].get_minutes_in_day());
+
     }
 
 }

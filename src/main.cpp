@@ -16,17 +16,24 @@
 #include "utils.h"
 #include "alerts.h"
 ////////////////////////////////////////////////////////
+#define DEBUG
+#ifdef DEBUG
+#define debug(x) Serial.println(x);
+#else
+#define debug(x)
+#endif
 
 #define SSID            F("heatmor-guest")
 #define SSIDPWD         F("")
 // #define SSID            F("heppners-2")
 // #define SSIDPWD         F("Cannotcrackit")
 
-StaticJsonDocument<2500> doc;
+// StaticJsonDocument<2500> doc;
+// DynamicJsonDocument doc(1024);
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\nstart program");
+  Serial.println(F("\nstart program"));
   Serial.println();
 
   LittleFSConfig cfg;
@@ -35,23 +42,36 @@ void setup() {
 
   LittleFS.begin();
 
-  // StaticJsonDocument<2500> doc;
   File file = LittleFS.open(F("/config.json"),"r");
+  size_t filesize = file.size();
+  // filea.close();
+  // StaticJsonDocument<2500> doc;
+  DynamicJsonDocument doc(filesize*2);
+
+  // File file = LittleFS.open(F("/config.json"),"r");
   deserializeJson(doc, file);
   file.close();
- 
+  doc.shrinkToFit();
+
   int numberSchedules = doc[F("Schedules")].size();
-  
+
   for( int i = 0; i < numberSchedules; i++){
     Schedules.addSchedule(Schedule(doc[F("Schedules")][i].as<JsonObject>()));
   }
 
   for( int day = 0 ; day < 7; day++){
-    dailyList[day].dayName =  doc[F("days")][day]["name"].as<String>();
-    for( size_t item = 0; item < doc[F("days")][day]["schedule"].size(); item++){
-      dailyList[day].AddSchedule(doc[F("days")][day]["schedule"][item].as<JsonObject>());
+    dailyList[day].dayName =  doc[F("days")][day][F("name")].as<String>();
+    for( size_t item = 0; item < doc[F("days")][day][F("schedule")].size(); item++){
+      dailyList[day].AddSchedule(doc[F("days")][day][F("schedule")][item].as<JsonObject>());
     }
   }
+
+  char* newName = "New Schedule";
+  const String* time1 = (const String*)"1:00";
+  const String* time2 = (const String*)"14:00";
+  Schedules.addSchedule(Schedule(newName));
+  Schedules[newName]->addAlert(time2,3,AlertTone::SINGLE);
+  Schedules[newName]->addAlert(time1,3,AlertTone::SINGLE);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, SSIDPWD);
@@ -79,7 +99,7 @@ void loop() {
     CSFromCursorDown();
     // Schedules["Morning overtime"]->debugPrintTimes();
     // Schedules[1]->debugPrintTimes();
-    // Schedules.Print();
+    Schedules.Print();
 
 		Serial.println ();
     
@@ -91,9 +111,9 @@ void loop() {
     Serial.printf("free: %5d - max: %5d - frag: %3d%% <- \n\r", free, max, frag);
     // gettimeofday(&tv, nullptr);
 
-    for( int i = 0 ; i < 7; i++){
-      dailyList[i].print();
-    }
+    // for( int i = 0 ; i < 7; i++){
+    //   dailyList[i].print();
+    // }
 
 
     Serial.print(asctime (localtime (&tnow)));

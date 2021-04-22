@@ -1,6 +1,4 @@
-// #include <StandardCplusplus.h>
 #include "ArduinoJson.h"
-// #include <set>
 #include <Arduino.h>
 
 enum AlertTone{ PULSE, SINGLE };
@@ -49,6 +47,7 @@ struct {
 class Schedule{
     public:
         Schedule();
+        Schedule(char* name){this->alertCount = 0; this->id = 0; this->name = name;}
         Schedule(JsonObject const jsonAlert);
         int getId(){return id;};
         void setId(int newID){id = newID;};
@@ -115,13 +114,13 @@ class ScheduleItems{
     public:
     String* getName() {return &name;};
     bool getRepeating() {return isrepeating;}; 
-    void setName(const String* newname){this->name = *newname; };
+    void setName(const String newname){this->name = newname; };
     void setRepeating(const bool repeat);
 
     ScheduleItems(){name= ""; isrepeating = 0;};
     ScheduleItems(JsonObject const jsonAlert){
-        name = jsonAlert["Name"].as<String>(); 
-        isrepeating = jsonAlert["repeat"];
+        setName(jsonAlert[F("Name")]); 
+        isrepeating = jsonAlert[F("repeat")];
     };
     void print(){Serial.printf("name: %s, repeating %d\n", name.c_str(), isrepeating);}
 
@@ -129,18 +128,13 @@ class ScheduleItems{
 
 struct{
 
-    // std::vector<ScheduleItems> list;
-    ScheduleItems list[10];
+    std::vector<ScheduleItems> list;
     size_t listsize=0;
     String dayName;
 
-    // void AddSchedule(ScheduleItems item){list.push_back(item);};
-    // void AddSchedule(JsonObject const jsonAlert){list.push_back(ScheduleItems(jsonAlert));};
-    // void print(){for (size_t i = 0; i < list.size(); i++){list[i].print();}}
-    
-    void AddSchedule(ScheduleItems item){list[listsize] = item;listsize++;};
-    void AddSchedule(JsonObject const jsonAlert){list[listsize] = (ScheduleItems(jsonAlert));listsize++;};
-    void print(){Serial.printf("Next List -> %s\n",dayName.c_str()); for (size_t i = 0; i < listsize; i++){Serial.print("\t");list[i].print();}}
+    void AddSchedule(ScheduleItems item){list.push_back(item);listsize++;};
+    void AddSchedule(JsonObject const jsonAlert){list.push_back(ScheduleItems(jsonAlert));listsize++;};
+    void print(){Serial.print(F("Next List -> "));Serial.println(dayName); for (size_t i = 0; i < listsize; i++){Serial.print("\t");list[i].print();}}
 
 
 }dailyList[7];
