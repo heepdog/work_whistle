@@ -18,7 +18,8 @@ Alert::Alert(const Alert* copy){
 }
 Alert::Alert(int id, const String* time, int duration, const AlertTone tone){
         setId(id);
-        setTime(time);
+        const String timeString = (const String)*time;
+        setTime(&timeString);
         setDuration(duration);
         setTone(tone);
 }
@@ -106,7 +107,7 @@ Schedule::Schedule(const JsonObject  jsonalerts){
         if(tmp.getId() == 0 ) tmp.setId(5);
         addAlert(tmp);
     }
-    std::sort(vectorAlerts.begin(),vectorAlerts.end(), AlertSort);
+    // std::sort(vectorAlerts.begin(),vectorAlerts.end(), AlertSort);
 
 }
 int Schedule::addAlert(const String* time, int durration, AlertTone tone){
@@ -116,8 +117,11 @@ int Schedule::addAlert(const String* time, int durration, AlertTone tone){
     tmp.setTone(tone);
     tmp.setId(vectorAlerts.size() + 1);
     // vectorAlerts.push_back(Alert(vectorAlerts.size()+1 , time, durration, tone));
-    vectorAlerts.push_back(tmp);
-    alertCount++;
+    Serial.println(*time);
+    addAlert(tmp);
+    // vectorAlerts.push_back(tmp);
+    // std::sort(vectorAlerts.begin(),vectorAlerts.end(), AlertSort);
+    // alertCount++;
 
     return 1;
 
@@ -125,9 +129,10 @@ int Schedule::addAlert(const String* time, int durration, AlertTone tone){
 int Schedule::addAlert(Alert nextAlert){
 
     vectorAlerts.push_back(nextAlert);
+    std::sort(vectorAlerts.begin(),vectorAlerts.end(), AlertSort);
+    alertCount++;
 
-
-    return 0;
+    return 1;
 
 }
 int Schedule::removeAlert(int index){

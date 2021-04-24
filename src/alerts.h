@@ -50,6 +50,7 @@ class Schedule{
         Schedule(char* name){this->alertCount = 0; this->id = 0; this->name = name;}
         Schedule(JsonObject const jsonAlert);
         int getId(){return id;};
+        int GetAlertTotal(){return vectorAlerts.size();};
         void setId(int newID){id = newID;};
         int addAlert(Alert);
         int addAlert(const String* time, int durration, AlertTone tone);

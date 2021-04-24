@@ -6,7 +6,7 @@
         {"name":"Wednesday","abbreviation":"wed","schedule":[{"Name":"Main","repeat":1}], "wday":3},
         {"name":"Thursday","abbreviation":"thu","schedule":[{"Name":"Main","repeat":1}], "wday":4},
         {"name":"Friday","abbreviation":"fri","schedule":[{"Name":"Main","repeat":1},{"Name":"Morning overtime","repeat":0},{"Name":"Evening overtime","repeat":1}], "wday":5},
-        {"name":"Saturday","abbreviation":"sat","schedule":[], "wday":6}
+        {"name":"Saturday","abbreviation":"sat","schedule":[{"Name":"Main","repeat":1}], "wday":6}
     ],
     "Schedules":[
         {"id":1, "name":"Main","alerts":[
