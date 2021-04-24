@@ -32,7 +32,9 @@
 // StaticJsonDocument<2500> doc;
 // DynamicJsonDocument doc(1024);
 
-buzzer speaker = buzzer(2,true);
+// set buzzer port 
+buzzer speaker = buzzer(LED_BUILTIN,true);
+int GetNextAlarm(int day, const char* minutes);
 
 
 void setup() {
@@ -48,11 +50,7 @@ void setup() {
 
   File file = LittleFS.open(F("/config.json"),"r");
   size_t filesize = file.size();
-  // filea.close();
-  // StaticJsonDocument<2500> doc;
   DynamicJsonDocument doc(filesize*2);
-
-  // File file = LittleFS.open(F("/config.json"),"r");
   deserializeJson(doc, file);
   file.close();
   doc.shrinkToFit();
@@ -76,7 +74,6 @@ void setup() {
   String time2 = "14:00";
   Schedules.addSchedule(Schedule(newName));
   Schedules[newName]->addAlert(&time2,3,AlertTone::SINGLE);
-  // Schedules[newName]->addAlert(&time1,3,AlertTone::SINGLE);
 
   
   WiFi.mode(WIFI_STA);
@@ -92,7 +89,6 @@ timeval tv;
 tm* tm_tm_now;
 time_t tnow;
 void testTime();
-int GetNextAlarm(int, const char*);
 bool addedTime = false;
 
 void loop() {
@@ -108,7 +104,7 @@ void loop() {
   char charTime[6];
   sprintf(charTime,"%2d:%02d",tm_tm_now->tm_hour, tm_tm_now->tm_min);
 
-  //test add alert 2 mins after starting
+  //for testing add alert 1 mins after starting
   if (cbtime_set && !addedTime){
 
     char charAlert[6];
@@ -126,9 +122,6 @@ void loop() {
 
     MoveCursorToLine(2);
     CSFromCursorDown();
-    // Schedules["Morning overtime"]->debugPrintTimes();
-    // Schedules[1]->debugPrintTimes();
-    // Schedules.Print();
 
 		Serial.printf("Current Day: %d\n",currentDay);
 		Serial.printf("Current Minute: %d\n",currentMinute);
@@ -140,11 +133,6 @@ void loop() {
     ESP.getHeapStats(&free, &max, &frag);
 
     Serial.printf("free: %5d - max: %5d - frag: %3d%% <- \n\r", free, max, frag);
-    // gettimeofday(&tv, nullptr);
-
-    // for( int i = 0 ; i < 7; i++){
-    //   dailyList[i].print();
-    // }
     dailyList[currentDay].print();
 
     Serial.print(asctime (localtime (&tnow)));
@@ -158,62 +146,14 @@ void loop() {
   }
 
  	if( tnow >= nextSecond ){
-     nextSecond = tnow + 1;
-    //  delay (1000);
-    // String printTime = asctime (localtime (&tnow));
-    // printTime.trim();
+    nextSecond = tnow + 1;
     MoveCursorToLine(1);
     ClearLineAtCursor();
 
-    // Serial.print(asctime (localtime (&tnow)));
     Serial.print(ctime (&tnow));
-    // Serial.print(Schedules.HasName("Main"));
-    // Serial.print(Schedules.HasName("toast"));
-   }
+  }
+
 }
-
-// void testTime(){
-//   gettimeofday(&tv, nullptr);
-//   tnow = time(nullptr);
-
-//   // localtime / gmtime every second change
-//   static time_t nextv = 0;
-//   if (nextv < tv.tv_sec) {
-//     nextv = tv.tv_sec+60;
-// #if 0
-// 		printf ("gettimeofday() tv.tv_sec : %ld\n", tv.tv_sec);
-// 		printf ("time()            time_t : %ld\n", tnow);
-// 		Serial.println ();
-// #endif
-
-// 		printf ((const char*)F("         ctime: %s"), ctime (&tnow));	// print formated local time
-// 		printf ((const char*)F(" local asctime: %s"), asctime (localtime (&tnow)));	// print formated local time
-// 		printf ((const char*)F("gmtime asctime: %s"), asctime (gmtime (&tnow)));	// print formated gm time
-
-// 		// print gmtime and localtime tm members
-// 		printTm ((const char*)F("      gmtime"), gmtime (&tnow));
-// 		Serial.println ();
-// 		printTm ((const char*)F("   localtime"), localtime (&tnow));
-// 		Serial.println ();
-// 		// printTm ("   clock", clock(&tnow));
-//     Serial.println(ESP.getFreeHeap());void
-//     uint32_t free;
-//     uint16_t max;
-//     uint8_t frag;
-//     ESP.getHeapStats(&free, &max, &frag);
-
-//     Serial.printf("free: %5d - max: %5d - frag: %3d%% <- ", free, max, frag);
-//     Serial.println();    //tnow = time(nullptrvoid);
-    // printTm ((const char*)F("   localtime"), localtime (&tnow));
-    // Serial.println();
-    // printf ((const char*)F(" local asctime: %s"), asctime (localtime (&tnow)));	// print formated local time
-    // Serial.println();
-
-
-//   }
-//   }
-// }
-
 int GetNextAlarm(int day, const char* minutes){
 
   // dailyList[day].print();

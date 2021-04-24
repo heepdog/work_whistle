@@ -138,5 +138,6 @@ struct{
     void print(){Serial.print(F("Next List -> "));Serial.println(dayName); for (size_t i = 0; i < listsize; i++){Serial.print("\t");list[i].print();}}
 
 
+
 }dailyList[7];
 
