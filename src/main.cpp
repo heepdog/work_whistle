@@ -34,7 +34,6 @@
 
 // set buzzer port 
 buzzer speaker = buzzer(LED_BUILTIN,true);
-int GetNextAlarm(int day, const char* minutes);
 
 
 void setup() {
@@ -136,7 +135,7 @@ void loop() {
     dailyList[currentDay].print();
 
     Serial.print(asctime (localtime (&tnow)));
-    if(GetNextAlarm(currentDay, charTime)){
+    if(dailyList[currentDay].hasAlarm(charTime)){
       speaker.buzzerOn(5,1);
     }
 
@@ -154,19 +153,4 @@ void loop() {
   }
 
 }
-int GetNextAlarm(int day, const char* minutes){
 
-  // dailyList[day].print();
-  for(size_t listnumber = 0; listnumber < dailyList[day].list.size(); listnumber++){
-    const char* scheduleName = dailyList[day].list[listnumber].getName()->c_str();
-    if(Schedules.HasName(scheduleName)){
-      if (!Schedules[scheduleName]->alertAtTime(minutes)){
-        return true;
-      }
-
-    };
-  }
-
-  return 0;
-
-}

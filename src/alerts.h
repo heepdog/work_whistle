@@ -136,7 +136,20 @@ struct{
     void AddSchedule(ScheduleItems item){list.push_back(item);listsize++;};
     void AddSchedule(JsonObject const jsonAlert){list.push_back(ScheduleItems(jsonAlert));listsize++;};
     void print(){Serial.print(F("Next List -> "));Serial.println(dayName); for (size_t i = 0; i < listsize; i++){Serial.print("\t");list[i].print();}}
+    int hasAlarm(const char* minutes){
+        for(size_t listnumber = 0; listnumber < list.size(); listnumber++){
+            const char* scheduleName = list[listnumber].getName()->c_str();
+            if(Schedules.HasName(scheduleName)){
+            if (!Schedules[scheduleName]->alertAtTime(minutes)){
+                return true;
+            }
 
+            };
+        }
+
+        return 0;
+
+    }
 
 
 }dailyList[7];
