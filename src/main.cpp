@@ -16,6 +16,9 @@
 #include "utils.h"
 #include "alerts.h"
 #include "buzzer.h"
+
+#include <ESP8266WiFiMulti.h>
+#include <ArduinoOTA.h>
 ////////////////////////////////////////////////////////
 #define DEBUG
 #ifdef DEBUG
@@ -24,16 +27,17 @@
 #define debug(x)
 #endif
 
-// #define SSID            F("heatmor-guest")
-// #define SSIDPWD         F("")
-#define SSID            F("heppners-2")
-#define SSIDPWD         F("Cannotcrackit")
+#define SSID            "kms-secure"
+#define SSIDPWD         "wearecamo2016"
+#define SSID2           "heppners-2"
+#define SSIDPWD2        "Cannotcrackit"
 
 // StaticJsonDocument<2500> doc;
 // DynamicJsonDocument doc(1024);
 
 // set buzzer port 
 buzzer speaker = buzzer(LED_BUILTIN,true);
+ESP8266WiFiMulti wifiMulti;
 
 
 void setup() {
@@ -74,11 +78,29 @@ void setup() {
   Schedules.addSchedule(Schedule(newName));
   Schedules[newName]->addAlert(&time2,3,AlertTone::SINGLE);
 
-  
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(SSID, SSIDPWD);
+  wifiMulti.addAP(SSID,SSIDPWD);
+  wifiMulti.addAP(SSID2,SSIDPWD2);
+  while(wifiMulti.run() != WL_CONNECTED) { // Wait for the Wi-Fi to connect
+    delay(250);
+    Serial.print('.');
+  };
+  // WiFi.mode(WIFI_STA);
+  // WiFi.begin(SSID, SSIDPWD);
 
   setup_timezones();
+
+  ArduinoOTA.setHostname("Timeclock");
+  ArduinoOTA.onStart([](){Serial.println("Starting OTA Programming");});
+  ArduinoOTA.onEnd([](){Serial.println("OTA Programming has finished");});
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+  ArduinoOTA.begin();
   ClearScreen();
 
 }
@@ -91,6 +113,8 @@ void testTime();
 bool addedTime = false;
 
 void loop() {
+
+  ArduinoOTA.handle();
 
   speaker.update();
 
@@ -134,7 +158,8 @@ void loop() {
     Serial.printf("free: %5d - max: %5d - frag: %3d%% <- \n\r", free, max, frag);
     dailyList[currentDay].print();
 
-    Serial.print(asctime (localtime (&tnow)));
+    Serial.print(WiFi.localIP());
+
     if(dailyList[currentDay].hasAlarm(charTime)){
       speaker.buzzerOn(5,1);
     }
