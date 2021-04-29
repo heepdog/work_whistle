@@ -16,6 +16,7 @@
 #include "utils.h"
 #include "alerts.h"
 #include "buzzer.h"
+#include "userwebsocket.h"
 
 #include <ESP8266WiFiMulti.h>
 #include <ArduinoOTA.h>
@@ -36,7 +37,8 @@
 // DynamicJsonDocument doc(1024);
 
 // set buzzer port 
-buzzer speaker = buzzer(LED_BUILTIN,true);
+buzzer led = buzzer(LED_BUILTIN,true);
+buzzer speaker = buzzer(D3,false);
 ESP8266WiFiMulti wifiMulti;
 
 
@@ -103,6 +105,24 @@ void setup() {
   ArduinoOTA.begin();
   ClearScreen();
 
+  ws.onEvent(onEvent);
+  server.addHandler(&ws);
+
+  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/html", index_html, NULL);
+  // });
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS,"/index.html");
+  });
+
+  server.begin();
+
+  pinMode(D6, OUTPUT);
+
+  digitalWrite(D6, LOW);
+
+
 }
 
 
@@ -117,6 +137,7 @@ void loop() {
   ArduinoOTA.handle();
 
   speaker.update();
+  led.update();
 
   static time_t nextMinute = 0;
   static time_t nextSecond = 0;
@@ -162,10 +183,16 @@ void loop() {
 
     if(dailyList[currentDay].hasAlarm(charTime)){
       speaker.buzzerOn(5,1);
+      led.buzzerOn(1,1);
     }
 
 
     MoveCursorToLine(1);
+
+
+
+
+
 
   }
 
