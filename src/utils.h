@@ -1,6 +1,6 @@
 #include <time.h>                       // time() ctime()
 
-// #define SEROUT
+#define SEROUT
 
 #define PTM(w) \
   Serial.print(":" #w "="); \
@@ -34,3 +34,14 @@
 
 void printTm(const char* what, const tm* tm);
  
+
+#define PINS(P) \
+  P(LED),  \
+  P(D3), \
+  P(D2), \
+  P(D1)
+
+#define IFPIN(pinenum, PINSTRING ,INPUTDATA)  if(String(#pinenum) == PINSTRING) digitalWrite(pinenum, INPUTDATA);
+
+#define CMP_DEFN(PINDEF,PINSTR) String(#PINDEF) == PINSTR
+#define PIN_TO_JSON_STATUS(PINDEF) "{ \"command\" : \"update\", \"pin\":\"" #PINDEF "\",\"value\": \"%d\" }", digitalRead(PINDEF)

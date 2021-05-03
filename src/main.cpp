@@ -42,6 +42,19 @@ buzzer speaker = buzzer(D3,false);
 ESP8266WiFiMulti wifiMulti;
 
 
+const char* const configFileName PROGMEM =  "/config.json";
+const char* const JsonSchedulesKey PROGMEM =  "Schedules";
+const char* const JsonScheduleKey PROGMEM =  "schedule";
+const char* const JsonNameKey PROGMEM =  "name";
+const char* const JsonDaysKey PROGMEM =  "days";
+
+// #define configFileName  "/config.json"
+// #define JsonSchedulesKey "Schedules"
+// #define JsonScheduleKey   "schedule"
+// #define JsonNameKey  "name"
+// #define JsonDaysKey  "days"
+
+
 void setup() {
   Serial.begin(115200);
   Serial.println(F("\nstart program"));
@@ -53,23 +66,26 @@ void setup() {
 
   LittleFS.begin();
 
-  File file = LittleFS.open(F("/config.json"),"r");
+
+  File file = LittleFS.open(configFileName,"r");
   size_t filesize = file.size();
   DynamicJsonDocument doc(filesize*2);
   deserializeJson(doc, file);
   file.close();
   doc.shrinkToFit();
 
-  int numberSchedules = doc[F("Schedules")].size();
 
+  int numberSchedules = doc[JsonSchedulesKey].size();
+// Iterates through all the items in the Schedules Key and adds it to the schedules array
   for( int i = 0; i < numberSchedules; i++){
-    Schedules.addSchedule(Schedule(doc[F("Schedules")][i].as<JsonObject>()));
+    Schedules.addSchedule(Schedule(doc[JsonSchedulesKey][i].as<JsonObject>()));
   }
 
+// Iterates through all of the days and adds the schedules that sould be run for each day
   for( int day = 0 ; day < 7; day++){
-    dailyList[day].dayName =  doc[F("days")][day][F("name")].as<String>();
-    for( size_t item = 0; item < doc[F("days")][day][F("schedule")].size(); item++){
-      dailyList[day].AddSchedule(doc[F("days")][day][F("schedule")][item].as<JsonObject>());
+    dailyList[day].dayName =  doc[JsonDaysKey][day][JsonNameKey].as<String>();
+    for( size_t item = 0; item < doc[JsonDaysKey][day][JsonScheduleKey].size(); item++){
+      dailyList[day].AddSchedule(doc[JsonDaysKey][day][JsonScheduleKey][item].as<JsonObject>());
     }
   }
 
@@ -105,22 +121,13 @@ void setup() {
   ArduinoOTA.begin();
   ClearScreen();
 
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
+  setupServer();
 
-  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-  //   request->send_P(200, "text/html", index_html, NULL);
-  // });
+ 
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS,"/index.html");
-  });
+  // pinMode(D6, OUTPUT);
 
-  server.begin();
-
-  pinMode(D6, OUTPUT);
-
-  digitalWrite(D6, LOW);
+  // digitalWrite(D6, LOW);
 
 
 }
@@ -134,8 +141,9 @@ bool addedTime = false;
 
 void loop() {
 
-  ArduinoOTA.handle();
+  ws.cleanupClients();
 
+  ArduinoOTA.handle();
   speaker.update();
   led.update();
 
@@ -186,6 +194,7 @@ void loop() {
       led.buzzerOn(1,1);
     }
 
+    sendTime();
 
     MoveCursorToLine(1);
 
