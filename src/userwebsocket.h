@@ -91,7 +91,7 @@ void setupServer(){
   ws.onEvent(onEvent);
   server.addHandler(&ws);
 
-  server.serveStatic("/",LittleFS,"/www/").setDefaultFile("index.html");
+  server.serveStatic("/",LittleFS,"/www/");
 
   server.begin();
 }

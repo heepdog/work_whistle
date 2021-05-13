@@ -38,7 +38,7 @@
 
 // set buzzer port 
 buzzer led = buzzer(LED_BUILTIN,true);
-buzzer speaker = buzzer(D3,false);
+buzzer speaker = buzzer(D2,false);
 ESP8266WiFiMulti wifiMulti;
 
 
@@ -94,7 +94,7 @@ void setup() {
   String time1 = "1:00";
   String time2 = "14:00";
   Schedules.addSchedule(Schedule(newName));
-  Schedules[newName]->addAlert(&time2,3,AlertTone::SINGLE);
+  Schedules[newName]->addAlert(&time2,1,AlertTone::SINGLE);
 
   wifiMulti.addAP(SSID,SSIDPWD);
   wifiMulti.addAP(SSID2,SSIDPWD2);
@@ -163,7 +163,7 @@ void loop() {
     sprintf(charAlert,"%2d:%02d",tm_tm_now->tm_hour, tm_tm_now->tm_min+1);
     String alertingTime = charAlert;
     debug("adding " + alertingTime);
-    Schedules["Main"]->addAlert(&alertingTime,3,AlertTone::SINGLE);
+    Schedules["Main"]->addAlert(&alertingTime,1,AlertTone::SINGLE);
     addedTime = true;
   }
 
@@ -190,7 +190,7 @@ void loop() {
     Serial.print(WiFi.localIP());
 
     if(dailyList[currentDay].hasAlarm(charTime)){
-      speaker.buzzerOn(5,1);
+      speaker.buzzerOn(1,1);
       led.buzzerOn(1,1);
     }
 
@@ -211,6 +211,7 @@ void loop() {
     ClearLineAtCursor();
 
     Serial.print(ctime (&tnow));
+    notifyClient(0);
   }
 
 }
