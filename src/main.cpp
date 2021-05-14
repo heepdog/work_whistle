@@ -163,7 +163,7 @@ void loop() {
     sprintf(charAlert,"%2d:%02d",tm_tm_now->tm_hour, tm_tm_now->tm_min+1);
     String alertingTime = charAlert;
     debug("adding " + alertingTime);
-    Schedules["Main"]->addAlert(&alertingTime,1,AlertTone::SINGLE);
+    Schedules["Main"]->addAlert(&alertingTime,4,AlertTone::PULSE);
     addedTime = true;
   }
 
@@ -188,10 +188,11 @@ void loop() {
     dailyList[currentDay].print();
 
     Serial.print(WiFi.localIP());
-
-    if(dailyList[currentDay].hasAlarm(charTime)){
-      speaker.buzzerOn(1,1);
-      led.buzzerOn(1,1);
+    if(  Alert* alarm = dailyList[currentDay].getAlarm(charTime))  {
+      int length = alarm->getDuration();
+      int mode = alarm->getTone();
+      speaker.buzzerOn(length,mode);
+      led.buzzerOn(length,mode);
     }
 
     sendTime();

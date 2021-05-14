@@ -10,14 +10,14 @@
     ],
     "Schedules":[
         {"id":1, "name":"Main","alerts":[
-            {"id":1,"time":"6:00","duration":1,"tone":"pulse"},
-            {"id":3,"time":"8:15","duration":1,"tone":"pulse"},
-            {"id":4,"time":"10:15","duration":1, "tone":"single"},
-            {"id":5,"time":"10:30","duration":1,"tone":"pulse"},
-            {"id":6,"time":"12:30","duration":1, "tone":"single"},
-            {"id":7,"time":"13:00","duration":1,"tone":"pulse"},
-            {"id":2,"time":"8:00","duration":1,"tone":"single"},
-            {"id":8,"time":"15:00","duration":1,"tone":"single"}
+            {"id":1,"time":"6:00","duration":15,"tone":"pulse"},
+            {"id":3,"time":"8:15","duration":15,"tone":"pulse"},
+            {"id":4,"time":"10:15","duration":5, "tone":"single"},
+            {"id":5,"time":"10:30","duration":15,"tone":"pulse"},
+            {"id":6,"time":"12:30","duration":5, "tone":"single"},
+            {"id":7,"time":"13:00","duration":15,"tone":"pulse"},
+            {"id":2,"time":"8:00","duration":5,"tone":"single"},
+            {"id":8,"time":"15:00","duration":5,"tone":"single"}
         ]
         },
         {"name":"Morning overtime","alerts":[

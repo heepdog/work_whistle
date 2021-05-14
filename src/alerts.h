@@ -64,17 +64,20 @@ class Schedule{
         void debugPrintTimes();
         int operator== (const char* RHS){ return strcmp(name.c_str(),RHS)==0;}
         ~Schedule();
-        int alertAtTime(const char* currentTime){
+        int hasAlertAtTime(const char* currentTime){
             return std::find(vectorAlerts.begin(),vectorAlerts.end(),currentTime)==vectorAlerts.end();
-            };
+        };
+        Alert*  getAlertAtTime(const char* currentTime){
+            return &(*std::find(vectorAlerts.begin(),vectorAlerts.end(),currentTime));
+        };
         
     private:
         int alertCount;
         int id;
         String name;
-        // Alert alerts[ 15*sizeof( Alert )];
+        // a vector of all the alerts
         std::vector<Alert> vectorAlerts;
-        // std::array<Alert,1<std::vector<Schedule>,
+        
 };
 
 
@@ -140,16 +143,24 @@ struct{
         for(size_t listnumber = 0; listnumber < list.size(); listnumber++){
             const char* scheduleName = list[listnumber].getName()->c_str();
             if(Schedules.HasName(scheduleName)){
-            if (!Schedules[scheduleName]->alertAtTime(minutes)){
-                return true;
-            }
-
+                if (!Schedules[scheduleName]->hasAlertAtTime(minutes)){
+                    return true;
+                }
             };
         }
-
         return 0;
-
-    }
+    };
+    Alert* getAlarm(const char* minutes){
+        for(size_t listnumber = 0; listnumber < list.size(); listnumber++){
+            const char* scheduleName = list[listnumber].getName()->c_str();
+            if(Schedules.HasName(scheduleName)){
+                if (!Schedules[scheduleName]->hasAlertAtTime(minutes)){
+                    return Schedules[scheduleName]->getAlertAtTime(minutes);
+                }
+            };
+        }
+        return (Alert*)0;
+    };
 
 
 }dailyList[7];

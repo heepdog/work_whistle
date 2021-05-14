@@ -1,7 +1,6 @@
 #include "Arduino.h"
 
 class buzzer{
-    const int pinNumber;
 
     public:
         buzzer(int pin):pinNumber(pin){
@@ -14,17 +13,35 @@ class buzzer{
             };
         void buzzerOn(int secondsOn, int mode){
             Serial.printf("\nturning on buzzer for %d Pin: %d \n", + secondsOn, pinNumber);
-            timeON = millis()+(secondsOn*1000);
-            digitalWrite(pinNumber,!invertOut);
-            on=true;
+            count = 0;
+            delay = (secondsOn*100);
+            if (mode == AlertTone::SINGLE){
+                timeON = millis()+delay;
+            }
+            else{
+                timeON = millis()+ delay/pulses+1; 
+            }
+                digitalWrite(pinNumber,!invertOut);
+                on=true;
+            
             };
         void update(){
-            if( on && (timeON < millis()) ){
-                Serial.printf("\n\nturning off buzzer on pin: %d \n", pinNumber);
-                digitalWrite(pinNumber,invertOut);
-                timeON = 0;
-                on = false;
+            if( (count < pulses)  && (timeON < millis())) {
+                if(on){
+                    Serial.printf("\n\nturning off buzzer on pin: %d \n", pinNumber);
+                    digitalWrite(pinNumber,invertOut);
+                    timeON = millis()+delay;
+                    on = false;
+                    count++;
+                }
+                else{
+                    digitalWrite(pinNumber,!invertOut);
+                    timeON = millis()+delay;
+                    on = true;
+
+                }
             };
+
         };
         
         
@@ -35,10 +52,19 @@ class buzzer{
             digitalWrite(pinNumber,invertOut);
             timeON = 0;
             on = false;
+            pulses = 3;
         };
         bool on;
         unsigned long timeON;
         bool invertOut;
+        //count the number of pulses we have sounded
+        int count;
+        //time on is divided by pulses + 1
+        int pulses;
+        int delay;
+
+        const int pinNumber;
+
 
 
 

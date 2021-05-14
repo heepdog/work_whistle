@@ -155,8 +155,8 @@ AlertTone Schedule::getAlertTone(int index){
     // return alerts[index].getTone();
     }
 int Schedule::getAlertDuration(int index){
-    // return alerts[index].getDuration();
-}
+    return vectorAlerts[index].getDuration();
+    }
 String* Schedule::getName(){
     return &name;
 }
