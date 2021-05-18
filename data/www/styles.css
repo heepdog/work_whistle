@@ -1,7 +1,12 @@
 
+body{
+    background:white;
+    color:black
+}
+
 h2 {background: #3285DC;
     color: #FFFFFF;
-    align:center;
+    align-content:center;
 }
 
 .content {
@@ -101,3 +106,57 @@ border-radius: 50%;
     margin: 3px
     
 }
+
+.weekday-list{
+    /* background-color:blue; */
+}
+
+ul.weekday-list{
+    background: red;
+}
+
+.weekday-list-item{
+    font-size: larger;
+}
+
+.daily-list-item{
+    width: 20em;
+    vertical-align: middle;
+    height: 100%;
+
+}
+
+.list-item-edit{
+    float:right;
+    display:inline;
+    text-decoration: underline;
+    font-size: smaller;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.list-item-edit:hover{
+    color: red;
+    cursor: pointer;
+}
+
+li.list-item-edit{
+    list-style-type: none;
+}
+
+li.daily-list-item:nth-child(odd){
+    background-color: honeydew;
+}
+li.daily-list-item:nth-child(even){
+    background-color: khaki;
+}
+
+/* .list-item-edit-block{
+    float: right;
+    background-color:red
+    width: 100%; 
+    display:inline;
+    text-align: right 
+
+
+}*/
