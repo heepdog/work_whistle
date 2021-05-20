@@ -149,10 +149,10 @@ int Schedule::modifyAlert(int index, int durration, AlertTone tone){
    
 }
 const String* Schedule::GetAlertTime(int index){
-    // return alerts[index].getTime();
+     return vectorAlerts[index].getTime();
     }
 AlertTone Schedule::getAlertTone(int index){ 
-    // return alerts[index].getTone();
+     return vectorAlerts[index].getTone();
     }
 int Schedule::getAlertDuration(int index){
     return vectorAlerts[index].getDuration();

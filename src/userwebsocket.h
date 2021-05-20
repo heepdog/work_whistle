@@ -41,6 +41,15 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     const char * const DigitalCommand("DigitalWrite");
     const char * const getDailySchedules("getDailySchedules");
     const char * const getSchedules("getSchedules");
+    const char * const DeleteAlert("DeleteAlert");
+    // const char * const EditAlert("EditAlert");
+    // const char * const EditSchedule("EditSchedule");
+    // const char * const RemoveSchedule("RemoveSchedule");
+    // const char * const NewSchedule("NewSchedule");
+    // const char * const DeleteSchedule("DeleteSchedule");
+    // const char * const AddAlert("AddAlert");
+    // const char * const AddSchedule("AddSchedule");
+    
     
 
     DynamicJsonDocument response(1600);
@@ -93,6 +102,9 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
 
     }
 
+    else if(command[JsonCommandKey].as<String>() == DeleteAlert ){
+      Serial.printf("got \"%s\"", DeleteAlert);
+    }
   }
 
 }

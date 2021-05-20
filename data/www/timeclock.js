@@ -53,8 +53,8 @@
           for(var scheduleName of jsondata[day.id]){
             elem.innerHTML = elem.innerHTML + `<li class="daily-list-item">${scheduleName}
                                                 <div class="edit-block">
-                                                  <div class="list-item-edit" id=\"${scheduleName}_edit">edit</div>
-                                                  <div class="list-item-edit"id=\"${scheduleName}_delete\">delete</div>
+                                                  <div class="list-item-edit" id="${scheduleName}_EditSchedule">edit</div>
+                                                  <div class="list-item-edit"id="${scheduleName}_DeleteSchedule">delete</div>
                                                 </div>
                                               </li>`;
 
@@ -76,7 +76,7 @@
       for(var scheduleName of jsondata.Schedules){
         if (!document.getElementById(scheduleName.Name)){
           var mainNode  = document.createElement("li");
-          mainNode.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="${scheduleName.Name}_add">Add Alert</div></div>`;
+          mainNode.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="${scheduleName.Name}_AddAlert">Add Alert</div></div>`;
           mainNode.id = scheduleName.Name;
           mainNode.classList.add("weekday-list-item");
           scheduleList[0].appendChild(mainNode);
@@ -88,7 +88,7 @@
                                                               <span class="alert-durration">${alert.Durration}</span>
                                                               <span class="alert-tone">${alert.Tone}</span>
                                                             </span>
-                                                            <div class="edit-block"><div class="list-item-edit" id="${alert.Time}_edit">edit</div><div class="list-item-edit"id="${alert.Time}_delete">delete</div></div>
+                                                            <div class="edit-block"><div class="list-item-edit" id="Alert_${alert.Time}_EditAlert">edit</div><div class="list-item-edit"id="Alert_${alert.Time}_DeleteAlert">delete</div></div>
                                                           </li>
                                                         </ul>`
 
@@ -102,15 +102,33 @@
   }
 
   function addScheduleToDay(event){
-
-    console.log(event.target.id)
-
     var msg = { command: event.target.id , date: Date.now()}
+    console.log(event.target.id)
+    var item;
+    var command;
+    [ item,  command] = event.target.id.split("_")
+    switch(command){
+      case "edit":
+        window.location.href = "/schedules.htm";
+        break;
+      case "delete":
+        event.target.parentElement.parentElement.remove;
+        msg.command = command;
+        msg.item = item;
+        break;
+      case "add":
+        break;
+      case "remove":
+        break;
+    }
+   
     if (webSocket.readyState == WebSocket.CLOSED){
       webSocket = new WebSocket(gwUrl);
     }
 
     webSocket.send(JSON.stringify(msg));
+
+
 
 
   }
