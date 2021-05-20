@@ -12,7 +12,7 @@ class buzzer{
             setup();
             };
         void buzzerOn(int secondsOn, int mode){
-            Serial.printf("\nturning on buzzer for %d Pin: %d \n", + secondsOn, pinNumber);
+            // Serial.printf("\nturning on buzzer for %d Pin: %d \n", + secondsOn, pinNumber);
             count = 0;
             delay = (secondsOn*100);
             if (mode == AlertTone::SINGLE){
@@ -28,7 +28,7 @@ class buzzer{
         void update(){
             if( (count < pulses)  && (timeON < millis())) {
                 if(on){
-                    Serial.printf("\n\nturning off buzzer on pin: %d \n", pinNumber);
+                    // Serial.printf("\n\nturning off buzzer on pin: %d \n", pinNumber);
                     digitalWrite(pinNumber,invertOut);
                     timeON = millis()+delay;
                     on = false;

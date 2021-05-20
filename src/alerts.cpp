@@ -174,3 +174,29 @@ void Schedule::debugPrintTimes(){
     }
 
 }
+
+void Schedule::toJSON(DynamicJsonDocument *buffer){
+    //DynamicJsonDocument JsonSchedule(200);
+    (*buffer)["Name"] = name;
+    for(size_t i = 0;i < vectorAlerts.size(); i++){
+        (*buffer)["Alerts"][i]["Time"]  = *vectorAlerts[i].getTime();
+        (*buffer)["Alerts"][i]["Durration"]  = vectorAlerts[i].getDuration();
+        (*buffer)["Alerts"][i]["Tone"]  = vectorAlerts[i].getTone();
+    }
+}
+
+void mySchedules::toJson(DynamicJsonDocument *buffer){
+    for(size_t i = 0; i<schedules.size();i++){
+        (*buffer)["Schedules"][i]["Name"] = schedules[i].getName()->c_str();
+
+        for(  int j = 0; j <schedules[i].GetAlertTotal(); j++){
+            (*buffer)["Schedules"][i]["Alerts"][j]["Time"] = schedules[i][j]->getTime()->c_str();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Durration"] = schedules[i][j]->getDuration();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Tone"] = schedules[i][j]->getTone();
+        }
+    }
+
+}
+
+weeklyDailyList dailyList[7];
+mySchedules Schedules;

@@ -1,3 +1,6 @@
+#ifndef ALERTS_H
+#define ALERTS_H
+
 #include "ArduinoJson.h"
 #include <Arduino.h>
 
@@ -62,6 +65,7 @@ class Schedule{
         String* getName();
         int validAlert(int index);
         void debugPrintTimes();
+        void toJSON(DynamicJsonDocument *buffer);
         int operator== (const char* RHS){ return strcmp(name.c_str(),RHS)==0;}
         ~Schedule();
         int hasAlertAtTime(const char* currentTime){
@@ -70,18 +74,20 @@ class Schedule{
         Alert*  getAlertAtTime(const char* currentTime){
             return &(*std::find(vectorAlerts.begin(),vectorAlerts.end(),currentTime));
         };
-        
+        std::vector<Alert>::iterator operator[](const int rhs){return vectorAlerts.begin()+ rhs;}
     private:
         int alertCount;
         int id;
         String name;
         // a vector of all the alerts
         std::vector<Alert> vectorAlerts;
+        class mySchedule;
         
 };
 
 
-struct {
+class mySchedules{
+  public:
   std::vector<Schedule> schedules;
   std::vector<Schedule>::iterator operator[](const char* schdName){
       return std::find<std::vector<Schedule>::iterator>(schedules.begin(),schedules.end(),schdName);
@@ -103,12 +109,14 @@ struct {
       schedules.push_back(data);
       return true;};
   void Print(){for( size_t i = 0; i < schedules.size();i++ ){schedules[i].debugPrintTimes();}}
+  void toJson(DynamicJsonDocument *buffer);
   bool HasName(const char * searchname){
       return std::find<std::vector<Schedule>::iterator>(schedules.begin(),schedules.end(),searchname) != schedules.end();
 
   }
 
-}Schedules;
+};
+extern mySchedules Schedules;
 
 class ScheduleItems{
     private:
@@ -130,12 +138,12 @@ class ScheduleItems{
 
 };
 
-struct{
+struct weeklyDailyList{
 
     std::vector<ScheduleItems> list;
     size_t listsize=0;
     String dayName;
-
+    
     void AddSchedule(ScheduleItems item){list.push_back(item);listsize++;};
     void AddSchedule(JsonObject const jsonAlert){list.push_back(ScheduleItems(jsonAlert));listsize++;};
     void print(){Serial.print(F("Next List -> "));Serial.println(dayName); for (size_t i = 0; i < listsize; i++){Serial.print("\t");list[i].print();}}
@@ -163,5 +171,8 @@ struct{
     };
 
 
-}dailyList[7];
+};
 
+extern  weeklyDailyList dailyList[7];
+
+#endif

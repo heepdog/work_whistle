@@ -109,6 +109,9 @@ border-radius: 50%;
 
 .weekday-list{
     /* background-color:blue; */
+    max-width: 40em;
+    min-width: 300px;
+    position: relative;
 }
 
 ul.weekday-list{
@@ -119,18 +122,23 @@ ul.weekday-list{
     font-size: larger;
 }
 
+.alert-list-item,
 .daily-list-item{
-    width: 20em;
+    /* width: 20em; */
+    border-style: solid;
+    border-color: grey;
+    border-width: 2px;
     vertical-align: middle;
     height: 100%;
+    position: relative;
+
 
 }
 
 .list-item-edit{
-    float:right;
     display:inline;
     text-decoration: underline;
-    font-size: smaller;
+    font-size:x-small;
     margin-left: 3px;
     margin-right: 3px;
 }
@@ -144,19 +152,31 @@ li.list-item-edit{
     list-style-type: none;
 }
 
+li.alert-list-item:nth-child(odd),
 li.daily-list-item:nth-child(odd){
-    background-color: honeydew;
+    background-color: rgb(245, 245, 245);
 }
+
+li.alert-list-item:nth-child(even),
 li.daily-list-item:nth-child(even){
-    background-color: khaki;
+    background-color: rgb(235, 235, 235);
+}
+.edit-block{
+    position: absolute;
+    display: inline;
+    height: 100%;
+    vertical-align: bottom;
+    right: 0;
 }
 
-/* .list-item-edit-block{
-    float: right;
-    background-color:red
-    width: 100%; 
-    display:inline;
-    text-align: right 
+.alert-time,
+.alert{
+    position: relative;
 
+}
 
-}*/
+.alert-durration,
+.alert-tone
+{
+    display: none
+}

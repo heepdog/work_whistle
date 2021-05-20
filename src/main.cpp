@@ -66,6 +66,15 @@ void setup() {
 
   LittleFS.begin();
 
+dailyList[0].dayName="sunday";
+dailyList[1].dayName="monday";
+dailyList[2].dayName="tueday";
+dailyList[3].dayName="wednesday";
+dailyList[4].dayName="thursday";
+dailyList[5].dayName="friday";
+dailyList[6].dayName="saturday";
+
+
 
   File file = LittleFS.open(configFileName,"r");
   size_t filesize = file.size();
@@ -212,7 +221,7 @@ void loop() {
     ClearLineAtCursor();
 
     Serial.print(ctime (&tnow));
-    notifyClient(0);
+    // notifyClient(0);
   }
 
 }

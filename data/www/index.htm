@@ -21,54 +21,59 @@ limitations under the License.
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Hello, world</title>
+    <title>KMS Timeclock</title>
     <link rel="stylesheet" href="styles.css">
     <script src="timeclock.js"></script>
+    <script>window.addEventListener("load",function(){ getDailySchedules()})</script>
 </head>
 
 <body>
     <h1>KMS Timeclock</h1>
     <div><h4>Daily Schedules</h4>
         <ol class="weekday-list">
-            <li class="weekday-list-item">Sunday &nbsp <button onclick='addScheduleToDay("Monday")'>Add Schedule</button>
+            <li class="weekday-list-item" id='Sunday'>Sunday<div class="edit-block"><div class="list-item-edit" id="Sunday_add">Add Schedule</div></div>
                 <ul class="daily-list">
-                    <li class="daily-list-item">test
-                        
-                            <div class="list-item-edit" onclick="editSchedule()">edit</div> 
-                            <div class="list-item-edit" onclick=deletefromday()>delete</div>
-                        </li>
+                    <li class="daily-list-item"><div class="edit-block"></div>
+                    </li>
                 </ul>
             </li>
-            <li class="weekday-list-item">Monday
+
+            <li class="weekday-list-item" id='Monday'>Monday<div class="edit-block"><div class="list-item-edit" id="Monday_add">Add Schedule</div></div>
                 <ul class="daily-list">
-                    <li class="daily-list-item">test</li>
+                    <li class="daily-list-item"></li>
                 </ul>
             </li>
-            <li class="weekday-list-item">Tuesday
+
+            <li class="weekday-list-item" id='Tuesday'>Tuesday<div class="edit-block"><div class="list-item-edit" id="Tuesday_add">Add Schedule</div></div>
                 <ul class="daily-list">
-                    <li class="daily-list-item">test</li>
+                    <li class="daily-list-item"></li>
                 </ul>
             </li>
-            <li class="weekday-list-item">Wednesday
+
+            <li class="weekday-list-item" id='Wednesday'>Wednesday<div class="edit-block"><div class="list-item-edit" id="Wednesday_add">Add Schedule</div></div>
                 <ul class="daily-list">
-                    <li class="daily-list-item">test</li>
+                    <li class="daily-list-item"></li>
                 </ul>
             </li>
-            <li class="weekday-list-item">Thursday
+
+            <li class="weekday-list-item" id='Thursday'>Thursday<div class="edit-block"><div class="list-item-edit" id="Thursday_add">Add Schedule</div></div>
                 <ul class="daily-list">
-                    <li class="daily-list-item">test</li>
+                    <li class="daily-list-item"></li>
                 </ul>
             </li>
-            <li class="weekday-list-item">Friday
+
+            <li class="weekday-list-item" id='Friday'>Friday<div class="edit-block"><div class="list-item-edit" id="Friday_add">Add Schedule</div></div>
                 <ul class="daily-list">
-                    <li class="daily-list-item">test</li>
+                    <li class="daily-list-item"></li>
                 </ul>
             </li>
-            <li class="weekday-list-item">Saturday
+
+            <li class="weekday-list-item" id='Saturday'>Saturday<div class="edit-block"><div class="list-item-edit" id="Saturday_add">Add Schedule</div></div>
                 <ul class="daily-list">
-                    <li class="daily-list-item">test</li>
+                    <li class="daily-list-item"><div class="edit-block"></div></li>
                 </ul>
             </li>
+            
         </ol>
 
     </div>
@@ -76,4 +81,9 @@ limitations under the License.
     <button onclick="fetchMessage()">Fetch Message</button>
     <p id="message">Click on the button to fetch the message.</p>
 </body>
+
+<script>
+    // document.getElementById("sunday_add").addEventListener("click", addScheduleToDay);
+    document.getElementsByClassName("weekday-list")[0].addEventListener("click", addScheduleToDay);
+</script>
 </html>

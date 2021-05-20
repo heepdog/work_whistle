@@ -1,9 +1,11 @@
-
+#ifndef USERWEBSOCKET_H
+#define USERwEBsOCKET_H
 #include <Arduino.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
 #include "utils.h"
+#include "alerts.h"
 
 // Web server running on port 80
 AsyncWebServer server(80);
@@ -29,7 +31,7 @@ void notifyClient(int status) {
 
 }
 
-void handlingIncomingData(void *arg, uint8_t *data, size_t len) {
+void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketClient *client) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
 
@@ -37,10 +39,16 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len) {
     const char * const JsonCommandKey("command");
     const char * const JsonPinKey("pin");
     const char * const DigitalCommand("DigitalWrite");
+    const char * const getDailySchedules("getDailySchedules");
+    const char * const getSchedules("getSchedules");
     
+
+    DynamicJsonDocument response(1600);
+    char buffer[1600];
+
     Serial.printf("data: %.*s\n",len, data);
     // DynamicJsonDocument command(len);
-    StaticJsonDocument<200> command;
+    StaticJsonDocument<500> command;
     deserializeJson(command,data);
     if(command[JsonCommandKey].as<String>() == DigitalCommand ){
       String pinNumber = command[JsonPinKey].as<String>();
@@ -57,10 +65,36 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len) {
       else if (CMP_DEFN(LED_BUILTIN, pinNumber))
         digitalWrite(LED_BUILTIN, value);
     }
+    else if(command[JsonCommandKey].as<String>() == getDailySchedules ){
+      response["command"] = "DailySchedules";
+
+      for (int i = 0 ; i < 7; i++){
+          for( size_t j = 0 ; j < dailyList[i].listsize; j++){
+            response[dailyList[i].dayName.c_str ()][j] = dailyList[i].list[j].getName()->c_str();
+          }
+      }
+
+      response.shrinkToFit();
+      
+      serializeJson(response,buffer);
+      client->printf(buffer);
+    }
     
-    notifyClient('1');
+    else if(command[JsonCommandKey].as<String>() == getSchedules ){
+      response["command"] = "GetSchedules";
+      Schedules.toJson(&response);
+      response.shrinkToFit();
+      Serial.printf("size of json doc: %d",response.size());
+
+      serializeJson(response,Serial);
+      serializeJson(response,buffer);
+      client->printf(buffer);
+
+
+    }
+
   }
-  
+
 }
 
 // Callback for incoming event
@@ -75,7 +109,7 @@ void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventTyp
          Serial.printf("Client disconnected:\n\tClient id:%u\n", client->id());
          break;
       case WS_EVT_DATA:
-         handlingIncomingData(arg, data, len);
+         handlingIncomingData(arg, data, len, client);
          break;
       case WS_EVT_PONG:
           Serial.printf("Pong:\n\tClient id:%u\n", client->id());
@@ -95,3 +129,6 @@ void setupServer(){
 
   server.begin();
 }
+
+
+#endif
