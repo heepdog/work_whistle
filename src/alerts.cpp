@@ -140,8 +140,16 @@ int Schedule::removeAlert(int index){
     vectorAlerts.erase(vectorAlerts.begin() + index);
 
     return 0;
+}
 
+int Schedule::removeAlert(const char* alertName){
 
+    if (!hasAlertAtTime(alertName)){
+        Serial.println(alertName);
+        vectorAlerts.erase(std::find(vectorAlerts.begin(),vectorAlerts.end(),alertName)); 
+        return 1;
+    }
+    return 0;
 }
 int Schedule::modifyAlert(int index, int durration, AlertTone tone){
 

@@ -58,6 +58,7 @@ class Schedule{
         int addAlert(Alert);
         int addAlert(const String* time, int durration, AlertTone tone);
         int removeAlert(int index);
+        int removeAlert(const char* alertName);
         int modifyAlert(int index, int durration, AlertTone tone);
         const String* GetAlertTime(int index);
         AlertTone getAlertTone(int index);

@@ -1,6 +1,6 @@
   function check(element) {
     console.log(element.id);
-    var msg = { command: "DigitalWrite", pin: element.id, data: element.checked?1:0 , date: Date.now()}
+    var msg = { Command: "DigitalWrite", Pin: element.id, Data: element.checked?1:0 , Date: Date.now()}
     if (webSocket.readyState == WebSocket.CLOSED){
       webSocket = new WebSocket(gwUrl);
     }
@@ -30,7 +30,7 @@
     console.log("message");
     var data = e.data;
     var jsondata = JSON.parse(data);
-    if(jsondata.command == "message"){
+    if(jsondata.Command == "message"){
       var newLine = document.createElement("P");
       newLine.className = "ConsoleLine"
       var newMessage = document.createTextNode(e.data);
@@ -38,13 +38,13 @@
       document.getElementById("messagebox").appendChild(newLine);
       document.getElementById("messagebox").lastElementChild.scrollIntoView(false);
     }
-    else if(jsondata.command == "update"){
+    else if(jsondata.Command == "update"){
       if (document.getElementById(jsondata.pin) != null){
         document.getElementById(jsondata.pin).checked = jsondata.value=="1"?true:false;
       }
     }
-    else if(jsondata.command == "DailySchedules"){
-      delete jsondata.command;
+    else if(jsondata.Command == "DailySchedules"){
+      delete jsondata.Command;
       var daylist = document.getElementsByClassName("weekday-list-item")
       for(var day of daylist){
         var elem = document.getElementById(day.id).childNodes[3];
@@ -53,8 +53,8 @@
           for(var scheduleName of jsondata[day.id]){
             elem.innerHTML = elem.innerHTML + `<li class="daily-list-item">${scheduleName}
                                                 <div class="edit-block">
-                                                  <div class="list-item-edit" id="${scheduleName}_EditSchedule">edit</div>
-                                                  <div class="list-item-edit"id="${scheduleName}_DeleteSchedule">delete</div>
+                                                  <div class="list-item-edit" id="EditSchedule_${scheduleName}">edit</div>
+                                                  <div class="list-item-edit"id="DeleteSchedule_${scheduleName}">delete</div>
                                                 </div>
                                               </li>`;
 
@@ -69,14 +69,14 @@
         
       }
     }
-    else if(jsondata.command == "GetSchedules"){
+    else if(jsondata.Command == "GetSchedules"){
       delete jsondata.command;
       var scheduleList = document.getElementsByClassName("weekday-list");
       scheduleList[0].innerHTML = ""
       for(var scheduleName of jsondata.Schedules){
         if (!document.getElementById(scheduleName.Name)){
           var mainNode  = document.createElement("li");
-          mainNode.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="${scheduleName.Name}_AddAlert">Add Alert</div></div>`;
+          mainNode.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="AddAlert_${scheduleName.Name}">Add Alert</div></div>`;
           mainNode.id = scheduleName.Name;
           mainNode.classList.add("weekday-list-item");
           scheduleList[0].appendChild(mainNode);
@@ -88,7 +88,7 @@
                                                               <span class="alert-durration">${alert.Durration}</span>
                                                               <span class="alert-tone">${alert.Tone}</span>
                                                             </span>
-                                                            <div class="edit-block"><div class="list-item-edit" id="Alert_${alert.Time}_EditAlert">edit</div><div class="list-item-edit"id="Alert_${alert.Time}_DeleteAlert">delete</div></div>
+                                                            <div class="edit-block"><div class="list-item-edit" id="EditAlert_${alert.Time}_${scheduleName.Name}">edit</div><div class="list-item-edit"id="DeleteAlert_${alert.Time}_${scheduleName.Name}">delete</div></div>
                                                           </li>
                                                         </ul>`
 
@@ -102,24 +102,30 @@
   }
 
   function addScheduleToDay(event){
-    var msg = { command: event.target.id , date: Date.now()}
+    var msg = { Command: event.target.id , Date: Date.now()}
     console.log(event.target.id)
     var item;
     var command;
-    [ item,  command] = event.target.id.split("_")
+    var item2;
+    [ command, item, item2] = event.target.id.split("_")
     switch(command){
-      case "edit":
+      case "EditSchedule":
         window.location.href = "/schedules.htm";
         break;
-      case "delete":
-        event.target.parentElement.parentElement.remove;
-        msg.command = command;
-        msg.item = item;
+      case "DeleteAlert":
+        event.target.parentElement.parentElement.remove();
+        msg.Command = command;
+        msg.Alert = item;
+        msg.Schedule = item2;
+        
+
         break;
-      case "add":
+      case "AddAlert":
         break;
-      case "remove":
+      case "RemoveSchedule":
         break;
+      default:
+        console.log(`${command} not found`);
     }
    
     if (webSocket.readyState == WebSocket.CLOSED){
@@ -134,12 +140,12 @@
   }
 
   function getDailySchedules(){
-    var msg = { command: "getDailySchedules", date: Date.now()}
+    var msg = { Command: "GetDailySchedules", Date: Date.now()}
     waitForSocketConnection(webSocket, function(){webSocket.send(JSON.stringify(msg));})
     
   }
   function getSchedules(){
-    var msg = { command: "getSchedules", date: Date.now()}
+    var msg = { Command: "GetSchedules", Date: Date.now()}
     waitForSocketConnection(webSocket, function(){webSocket.send(JSON.stringify(msg));})
     
   }

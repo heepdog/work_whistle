@@ -1,6 +1,6 @@
 #include <time.h>                       // time() ctime()
 
-// #define SEROUT
+#define SEROUT
 
 #define PTM(w) \
   Serial.print(":" #w "="); \

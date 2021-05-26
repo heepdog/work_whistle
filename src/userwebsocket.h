@@ -12,6 +12,8 @@ AsyncWebServer server(80);
 // Web socket
 AsyncWebSocket ws("/ws");
 
+
+
 void sendTime(){
   ws.pingAll();
   // ws.ping(1);
@@ -33,14 +35,15 @@ void notifyClient(int status) {
 
 void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketClient *client) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
+
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
 
-    const char * const JsonDataKey("data");
-    const char * const JsonCommandKey("command");
-    const char * const JsonPinKey("pin");
+    const char * const JsonDataKey("Data");
+    const char * const JsonCommandKey("Command");
+    const char * const JsonPinKey("Pin");
     const char * const DigitalCommand("DigitalWrite");
-    const char * const getDailySchedules("getDailySchedules");
-    const char * const getSchedules("getSchedules");
+    const char * const getDailySchedules("GetDailySchedules");
+    const char * const getSchedules("GetSchedules");
     const char * const DeleteAlert("DeleteAlert");
     // const char * const EditAlert("EditAlert");
     // const char * const EditSchedule("EditSchedule");
@@ -52,8 +55,9 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     
     
 
-    DynamicJsonDocument response(1600);
-    char buffer[1600];
+    DynamicJsonDocument response(2000);
+    // JsonObject &response = jsonBuffer.createOLbject();
+    // char buffer[1000];
 
     Serial.printf("data: %.*s\n",len, data);
     // DynamicJsonDocument command(len);
@@ -74,8 +78,10 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
       else if (CMP_DEFN(LED_BUILTIN, pinNumber))
         digitalWrite(LED_BUILTIN, value);
     }
+    
     else if(command[JsonCommandKey].as<String>() == getDailySchedules ){
-      response["command"] = "DailySchedules";
+      Serial.printf("got \"%s\" \n", getDailySchedules);
+      response[JsonCommandKey] = "DailySchedules";
 
       for (int i = 0 ; i < 7; i++){
           for( size_t j = 0 ; j < dailyList[i].listsize; j++){
@@ -83,28 +89,59 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
           }
       }
 
-      response.shrinkToFit();
-      
-      serializeJson(response,buffer);
-      client->printf(buffer);
+          
+      // serializeJson(response,buffer);
+      // client->printf(buffer);
     }
     
     else if(command[JsonCommandKey].as<String>() == getSchedules ){
-      response["command"] = "GetSchedules";
+      Serial.printf("got \"%s\" \n", getSchedules);
+      response[JsonCommandKey] = "GetSchedules";
       Schedules.toJson(&response);
-      response.shrinkToFit();
-      Serial.printf("size of json doc: %d",response.size());
+      // response.shrinkToFit();
+      // Serial.printf("size of json doc: %d\n",response.memoryUsage());
 
-      serializeJson(response,Serial);
-      serializeJson(response,buffer);
-      client->printf(buffer);
+      // serializeJson(response,Serial);
+      // serializeJson(response,buffer);
+      // Serial.println("sending Response");
+      // client->text(buffer);
+      // Serial.println("done sending");
+ 
 
 
     }
 
     else if(command[JsonCommandKey].as<String>() == DeleteAlert ){
-      Serial.printf("got \"%s\"", DeleteAlert);
+      Serial.printf("got \"%s\" \n", DeleteAlert);
+      String alertTime = command["Alert"];
+      String scheduleName = command["Schedule"];
+      Schedules[scheduleName.c_str()]->removeAlert(alertTime.c_str());
+      response[JsonCommandKey] = "TesData";
+      response["otherdata"]="here";
+
+
     }
+
+
+  response.shrinkToFit();
+  size_t bufferLength = measureJson(response)+1;
+  Serial.println("Creating buffer");
+  // AsyncWebSocketMessageBuffer *buffer = ws.makeBuffer(bufferLength) ;
+
+  void *buffer = malloc(bufferLength);
+  if (buffer){
+    Serial.println("Serealizing Json");
+    serializeJson(response,buffer, bufferLength);
+    if(client){
+      Serial.println("Sending Json");
+      client->text((char *)buffer);
+      Serial.println("done sending json");
+    } else{
+      ws.textAll((char *)buffer);
+    }
+  }
+  free(buffer);
+
   }
 
 }
