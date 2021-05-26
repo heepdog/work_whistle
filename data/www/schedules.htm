@@ -31,17 +31,27 @@ limitations under the License.
 <body>
     <h1>KMS Timeclock</h1>
     <div><h4>Schedule List</h4>
-        <ol class="weekday-list">
-
- 
-             
-        </ol>
-
+        <ol class="weekday-list"></ol>
     </div>
 
+
+    <div id="formAdd" class="modal">
+        <div class=add-alert-content>
+            <span class="modal-close">&times;</span>
+            <form>
+                <label for="alertTime">Add Alert to <span id="ScheduleName">test</span>:</label><input type="time" name="alertTime" id="alertTime">
+                <input type="button" value="Submit" id="alertAddSubmit">
+            </form>
+        </div>
+    </div>
 </body>
 
 <script>
     document.getElementsByClassName("weekday-list")[0].addEventListener("click", addScheduleToDay);
+    document.getElementsByClassName("modal-close")[0].addEventListener("click", hideModal);
+    document.getElementById("alertAddSubmit").addEventListener("click",AddAlertToSchedule);
+
+    window.addEventListener("click", function() {if(event.target.className == "modal"){hideModal()}})
+
 </script>
 </html>

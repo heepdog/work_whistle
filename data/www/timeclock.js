@@ -81,10 +81,11 @@
           mainNode.classList.add("weekday-list-item");
           scheduleList[0].appendChild(mainNode);
           for(var alert of scheduleName.Alerts){
+            var timestr = get12HrString(alert.Time)
             mainNode.innerHTML = mainNode.innerHTML +  `<ul class="alert-list">
                                                           <li class="alert-list-item">
                                                             <span class="alert">
-                                                              <span class="alert-time">${alert.Time}</span>
+                                                              <span class="alert-time">${timestr}</span>
                                                               <span class="alert-durration">${alert.Durration}</span>
                                                               <span class="alert-tone">${alert.Tone}</span>
                                                             </span>
@@ -117,10 +118,11 @@
         msg.Command = command;
         msg.Alert = item;
         msg.Schedule = item2;
-        
-
         break;
       case "AddAlert":
+        document.getElementById("formAdd").style.display="block";
+        document.getElementById("ScheduleName").innerText = item
+
         break;
       case "RemoveSchedule":
         break;
@@ -165,4 +167,25 @@ function waitForSocketConnection(socket, callback){
             }
 
         }, 5); // wait 5 milisecond for the connection...
+}
+
+function get12HrString(timestr){
+  var hours, minutes;
+  [hours, minutes] = timestr.split(":");
+  var hourint = parseInt(hours);
+  return String(hourint>12?hourint-12:hourint) + `:${minutes}` + (hourint>=12?" PM":" AM")
+}
+
+function hideModal(){
+  document.getElementsByClassName("modal")[0].style.display = "none";
+}
+function AddAlertToSchedule(event){
+  var time = (document.getElementById("alertTime").value);
+  var schedule = (document.getElementById("ScheduleName").innerText);
+  // document.getElementById("alertTime").value = null;
+  hideModal();
+  var msg = { Command: "AddAlert", Schedule: schedule, AlertTime: time};
+  webSocket.send(JSON.stringify(msg));
+
+
 }
