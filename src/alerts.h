@@ -82,7 +82,6 @@ class Schedule{
         String name;
         // a vector of all the alerts
         std::vector<Alert> vectorAlerts;
-        class mySchedule;
         
 };
 
@@ -91,7 +90,7 @@ class mySchedules{
   public:
   std::vector<Schedule> schedules;
   std::vector<Schedule>::iterator operator[](const char* schdName){
-      return std::find<std::vector<Schedule>::iterator>(schedules.begin(),schedules.end(),schdName);
+      return getSchedule(schdName);
     //   std::vector<Schedule>::iterator returnValue= schedules.begin();
     //   size_t index = 0;
     //   while(index < schedules.size()){
@@ -99,10 +98,14 @@ class mySchedules{
     //           return schedules.begin()+index;
     //           }
     //           index++;
-    //   };
+    //   };c schdNameschdName  
     //     return (std::vector<Schedule>::iterator)NULL;
 
       };
+  std::vector<Schedule>::iterator getSchedule(const char* schdName){
+    return std::find<std::vector<Schedule>::iterator>(schedules.begin(),schedules.end(),schdName);
+
+  }
   std::vector<Schedule>::iterator operator[](const int test){return schedules.begin()+test;};
   bool addSchedule(Schedule data){
       if (HasName(data.getName()->c_str())) return false;
@@ -111,9 +114,9 @@ class mySchedules{
       return true;};
   void Print(){for( size_t i = 0; i < schedules.size();i++ ){schedules[i].debugPrintTimes();}}
   void toJson(DynamicJsonDocument *buffer);
+  void toJson(String *scheduleName, DynamicJsonDocument *buffer);
   bool HasName(const char * searchname){
       return std::find<std::vector<Schedule>::iterator>(schedules.begin(),schedules.end(),searchname) != schedules.end();
-
   }
 
 };

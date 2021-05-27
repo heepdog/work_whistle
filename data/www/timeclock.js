@@ -27,78 +27,84 @@
   }
  
   webSocket.onmessage = function(e) {
-    console.log("message");
     var data = e.data;
-    var jsondata = JSON.parse(data);
-    if(jsondata.Command == "message"){
-      var newLine = document.createElement("P");
-      newLine.className = "ConsoleLine"
-      var newMessage = document.createTextNode(e.data);
-      newLine.appendChild(newMessage);
-      document.getElementById("messagebox").appendChild(newLine);
-      document.getElementById("messagebox").lastElementChild.scrollIntoView(false);
-    }
-    else if(jsondata.Command == "update"){
-      if (document.getElementById(jsondata.pin) != null){
-        document.getElementById(jsondata.pin).checked = jsondata.value=="1"?true:false;
+    if (data != "null"){
+      console.log(e.data);
+      var jsondata = JSON.parse(data);
+      if(jsondata.Command == "message"){
+        var newLine = document.createElement("P");
+        newLine.className = "ConsoleLine"
+        var newMessage = document.createTextNode(e.data);
+        newLine.appendChild(newMessage);
+        document.getElementById("messagebox").appendChild(newLine);
+        document.getElementById("messagebox").lastElementChild.scrollIntoView(false);
       }
-    }
-    else if(jsondata.Command == "DailySchedules"){
-      delete jsondata.Command;
-      var daylist = document.getElementsByClassName("weekday-list-item")
-      for(var day of daylist){
-        var elem = document.getElementById(day.id).childNodes[3];
-        if(jsondata[day.id]){
-          elem.innerHTML = "";
-          for(var scheduleName of jsondata[day.id]){
-            elem.innerHTML = elem.innerHTML + `<li class="daily-list-item">${scheduleName}
-                                                <div class="edit-block">
-                                                  <div class="list-item-edit" id="EditSchedule_${scheduleName}">edit</div>
-                                                  <div class="list-item-edit"id="DeleteSchedule_${scheduleName}">delete</div>
-                                                </div>
-                                              </li>`;
-
-          }
+      else if(jsondata.Command == "update"){
+        if (document.getElementById(jsondata.pin) != null){
+          document.getElementById(jsondata.pin).checked = jsondata.value=="1"?true:false;
         }
-        else{
-          elem.innerHTML = `<li class="daily-list-item">
-                              <div class="edit-block"></div>
-                            </li>`;
-        }
-
-        
       }
-    }
-    else if(jsondata.Command == "GetSchedules"){
-      delete jsondata.command;
-      var scheduleList = document.getElementsByClassName("weekday-list");
-      scheduleList[0].innerHTML = ""
-      for(var scheduleName of jsondata.Schedules){
-        if (!document.getElementById(scheduleName.Name)){
-          var mainNode  = document.createElement("li");
-          mainNode.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="AddAlert_${scheduleName.Name}">Add Alert</div></div>`;
-          mainNode.id = scheduleName.Name;
-          mainNode.classList.add("weekday-list-item");
-          scheduleList[0].appendChild(mainNode);
-          for(var alert of scheduleName.Alerts){
-            var timestr = get12HrString(alert.Time)
-            mainNode.innerHTML = mainNode.innerHTML +  `<ul class="alert-list">
-                                                          <li class="alert-list-item">
-                                                            <span class="alert">
-                                                              <span class="alert-time">${timestr}</span>
-                                                              <span class="alert-durration">${alert.Durration}</span>
-                                                              <span class="alert-tone">${alert.Tone}</span>
-                                                            </span>
-                                                            <div class="edit-block"><div class="list-item-edit" id="EditAlert_${alert.Time}_${scheduleName.Name}">edit</div><div class="list-item-edit"id="DeleteAlert_${alert.Time}_${scheduleName.Name}">delete</div></div>
-                                                          </li>
-                                                        </ul>`
+      else if(jsondata.Command == "DailySchedules"){
+        delete jsondata.Command;
+        var daylist = document.getElementsByClassName("weekday-list-item")
+        for(var day of daylist){
+          var elem = document.getElementById(day.id).childNodes[3];
+          if(jsondata[day.id]){
+            elem.innerHTML = "";
+            for(var scheduleName of jsondata[day.id]){
+              elem.innerHTML = elem.innerHTML + `<li class="daily-list-item">${scheduleName}
+                                                  <div class="edit-block">
+                                                    <div class="list-item-edit" id="EditSchedule_${scheduleName}">edit</div>
+                                                    <div class="list-item-edit"id="DeleteSchedule_${scheduleName}">delete</div>
+                                                  </div>
+                                                </li>`;
 
+            }
           }
+          else{
+            elem.innerHTML = `<li class="daily-list-item">
+                                <div class="edit-block"></div>
+                              </li>`;
+          }
+
           
         }
+      }
+      else if(jsondata.Command == "GetSchedules"){
+        delete jsondata.command;
+        var scheduleList = document.getElementsByClassName("weekday-list");
+        //scheduleList[0].innerHTML = ""
+        for(var scheduleName of jsondata.Schedules){
+          var el = document.getElementById(scheduleName.Name);
+          if (el){
+            el.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="AddAlert_${scheduleName.Name}">Add Alert</div></div>`;
+          } else {
+              
+            var el  = document.createElement("li");
+            el.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="AddAlert_${scheduleName.Name}">Add Alert</div></div>`;
+            el.id = scheduleName.Name;
+            el.classList.add("weekday-list-item");
+            scheduleList[0].appendChild(el);
+          }
+            // var mainNode = document.getElementById(scheduleName.Name);
+            for(var alert of scheduleName.Alerts){
+              var timestr = get12HrString(alert.Time)
+              el.innerHTML = el.innerHTML +  `<ul class="alert-list">
+                                                            <li class="alert-list-item">
+                                                              <span class="alert">
+                                                                <span class="alert-time">${timestr}</span>
+                                                                <span class="alert-durration">${alert.Durration}</span>
+                                                                <span class="alert-tone">${alert.Tone}</span>
+                                                              </span>
+                                                              <div class="edit-block"><div class="list-item-edit" id="EditAlert_${alert.Time}_${scheduleName.Name}">edit</div><div class="list-item-edit"id="DeleteAlert_${alert.Time}_${scheduleName.Name}">delete</div></div>
+                                                            </li>
+                                                          </ul>`
+            
+          }
+
+        }
 
       }
-
     }
   }
 

@@ -66,13 +66,13 @@ void setup() {
 
   LittleFS.begin();
 
-dailyList[0].dayName="sunday";
-dailyList[1].dayName="monday";
-dailyList[2].dayName="tueday";
-dailyList[3].dayName="wednesday";
-dailyList[4].dayName="thursday";
-dailyList[5].dayName="friday";
-dailyList[6].dayName="saturday";
+  dailyList[0].dayName="sunday";
+  dailyList[1].dayName="monday";
+  dailyList[2].dayName="tueday";
+  dailyList[3].dayName="wednesday";
+  dailyList[4].dayName="thursday";
+  dailyList[5].dayName="friday";
+  dailyList[6].dayName="saturday";
 
 
 
@@ -81,7 +81,7 @@ dailyList[6].dayName="saturday";
   DynamicJsonDocument doc(filesize*2);
   deserializeJson(doc, file);
   file.close();
-  doc.shrinkToFit();
+  // doc.shrinkToFit();
 
 
   int numberSchedules = doc[JsonSchedulesKey].size();
@@ -89,6 +89,13 @@ dailyList[6].dayName="saturday";
   for( int i = 0; i < numberSchedules; i++){
     Schedules.addSchedule(Schedule(doc[JsonSchedulesKey][i].as<JsonObject>()));
   }
+  
+  File file = LittleFS.open(configFileName,"r");
+  size_t filesize = file.size();
+  DynamicJsonDocument doc(filesize*2);
+  deserializeJson(doc, file);
+  file.close();
+
 
 // Iterates through all of the days and adds the schedules that sould be run for each day
   for( int day = 0 ; day < 7; day++){

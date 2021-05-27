@@ -206,5 +206,22 @@ void mySchedules::toJson(DynamicJsonDocument *buffer){
 
 }
 
+void mySchedules::toJson(String *scheduleName, DynamicJsonDocument *buffer){
+    // for(size_t i = 0; i<schedules.size();i++){
+        int i = 0;
+        auto thisSchedule = getSchedule(scheduleName->c_str());
+
+        (*buffer)["Schedules"][i]["Name"] = thisSchedule->getName()->c_str();
+        thisSchedule->operator[](1);
+
+        for(  int j = 0; j <schedules[i].GetAlertTotal(); j++){
+            (*buffer)["Schedules"][i]["Alerts"][j]["Time"] = thisSchedule->operator[](j)->getTime()->c_str();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Durration"] = thisSchedule->operator[](j)->getDuration();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Tone"] = thisSchedule->operator[](j)->getTone();
+        }
+    }
+
+
+
 weeklyDailyList dailyList[7];
 mySchedules Schedules;

@@ -50,7 +50,7 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     // const char * const RemoveSchedule("RemoveSchedule");
     // const char * const NewSchedule("NewSchedule");
     // const char * const DeleteSchedule("DeleteSchedule");
-    // const char * const AddAlert("AddAlert");
+     const char * const AddAlert("AddAlert");
     // const char * const AddSchedule("AddSchedule");
     
     
@@ -115,12 +115,20 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
       Serial.printf("got \"%s\" \n", DeleteAlert);
       String alertTime = command["Alert"];
       String scheduleName = command["Schedule"];
-      Schedules[scheduleName.c_str()]->removeAlert(alertTime.c_str());
-      response[JsonCommandKey] = "TesData";
-      response["otherdata"]="here";
-
-
+      response["Result"]= Schedules[scheduleName.c_str()]->removeAlert(alertTime.c_str());
+      response[JsonCommandKey] = "AddAlertResponse";
     }
+    else if(command[JsonCommandKey].as<String>() == AddAlert ){
+      Serial.printf("got \"%s\" \n", AddAlert);
+      response[JsonCommandKey] = "GetSchedules";
+
+      // {"Command":"AddAlert","Schedule":"Main","AlertTime":"07:42"}
+      String scheduleName= command["Schedule"];
+      String AlertTime = command["AlertTime"];
+      Schedules[scheduleName.c_str()]->addAlert(&AlertTime,15,AlertTone::SINGLE);
+      Schedules.toJson(&scheduleName,&response);
+    }
+
 
 
   response.shrinkToFit();
