@@ -120,17 +120,25 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     // Add Alert To Schedule
     else if(command[JsonCommandKey].as<String>() == AddAlert ){
       Serial.printf("got \"%s\" \n", AddAlert);
-      response[JsonCommandKey] = "GetSchedules";
 
       String scheduleName= command["Schedule"];
       String AlertTime = command["AlertTime"];
       response["Result"] = Schedules[scheduleName.c_str()]->addAlert(&AlertTime,15,AlertTone::SINGLE);
-      saveSchedules(&response);
-      Schedules.toJson(&scheduleName,&response);
+      if(response["Result"] ==1){
+        saveSchedules(&response);
+      }
+      response[JsonCommandKey] = "GetSchedules";
+
+      // Schedules.toJson(&scheduleName,&response);
     }
 
     else if(command[JsonCommandKey].as<String>() == NewSchedule ){
-      
+      response["Result"] = Schedules.addSchedule( Schedule( command["Name"].as<String>() ) );
+      if(response["Result"] ==1){
+        saveSchedules(&response);
+      }
+      response[JsonCommandKey] = "GetSchedules";
+
     }
 
   response.shrinkToFit();
@@ -159,6 +167,7 @@ int saveSchedules(DynamicJsonDocument *json){
   File schedulejson = LittleFS.open("schedules.json","w");
   serializeJsonPretty(*json,schedulejson);
   schedulejson.close();
+  return 1;
 }
 // Callback for incoming event
 void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, 

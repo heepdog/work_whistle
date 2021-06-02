@@ -164,7 +164,6 @@ li.daily-list-item:nth-child(even){
 .edit-block{
     position: absolute;
     display: inline;
-    height: 100%;
     vertical-align: bottom;
     right: 0;
 }
@@ -215,4 +214,15 @@ li.daily-list-item:nth-child(even){
   color: #000;
   text-decoration: none;
   cursor: pointer;
+}
+
+.add-button{
+    position: absolute;
+    right:0;
+    bottom: 0;
+}
+.schedule-header{
+    position: relative;
+    max-width: 42.5em;
+    min-width: 350px;
 }

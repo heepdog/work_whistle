@@ -50,7 +50,7 @@ struct {
 class Schedule{
     public:
         Schedule();
-        Schedule(char* name){this->alertCount = 0; this->id = 0; this->name = name;}
+        Schedule(String name){this->alertCount = 0; this->id = 0; this->name = name;}
         Schedule(JsonObject const jsonAlert);
         int getId(){return id;};
         int GetAlertTotal(){return vectorAlerts.size();};

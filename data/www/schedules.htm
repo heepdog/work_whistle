@@ -30,28 +30,48 @@ limitations under the License.
 
 <body>
     <h1>KMS Timeclock</h1>
-    <div><h4>Schedule List</h4>
+    <div><div class="schedule-header"><h4>Schedule List</h4> <button class="add-button" id="NewScheduleModalbutton">Add Schedule</button></div>
         <ol class="weekday-list"></ol>
     </div>
 
-
-    <div id="formAdd" class="modal">
-        <div class=add-alert-content>
-            <span class="modal-close">&times;</span>
-            <form>
-                <label for="alertTime">Add Alert to <span id="ScheduleName">test</span>:</label><input type="time" name="alertTime" id="alertTime">
-                <input type="button" value="Submit" id="alertAddSubmit">
-            </form>
-        </div>
+<!-- This is the modal form to add an alert to the schedule that was clicked -->
+<div id="formAdd" class="modal">
+    <div class="add-alert-content">
+        <span class="modal-close">&times;</span>
+        <form id="AddAlertForm">
+            <label for="alertTime">Add Alert to <span id="ScheduleName"></span>:</label><input type="time" name="alertTime" id="alertTime">
+            <input type="button" value="Submit" id="alertAddSubmit">
+        </form>
     </div>
+</div>
+
+<!-- This is the modal form to create a new Schedule -->
+<div id="NewScheduleModal" class="modal">
+    <div class="add-alert-content">
+        <span class="modal-close">&times;</span>
+        <form id="NewScheduleForm">
+            <label for="NewScheduleName">New Schedule Name:</label><input type="text" name="NewScheduleName" id="NewScheduleName">
+            <input type="button" value="Submit" id="NewScheduleNameSubmit">
+        </form>
+    </div>
+</div>
+
+
 </body>
 
 <script>
+    // adds on click to any item in the schedule list
     document.getElementsByClassName("weekday-list")[0].addEventListener("click", addScheduleToDay);
-    document.getElementsByClassName("modal-close")[0].addEventListener("click", hideModal);
+    // hides the addAlert modal if the close button is clicked or the form is clicked off
+    document.getElementsByClassName("modal-close")[0].addEventListener("click", HideModal);
+    // submit button to send data to add an alert to the server
     document.getElementById("alertAddSubmit").addEventListener("click",AddAlertToSchedule);
+    // shows the new schedule modal form to create a new schedule
+    document.getElementById("NewScheduleModalbutton").addEventListener("click", function (){document.getElementById("NewScheduleModal").style.display = "block";} );
+    document.getElementsByClassName("modal-close")[1].addEventListener("click", HideModal);
+    document.getElementById("NewScheduleNameSubmit").addEventListener("click",NewSchedule);
 
-    window.addEventListener("click", function() {if(event.target.className == "modal"){hideModal()}})
+    window.addEventListener("click", function() {if(event.target.className == "modal"){HideModal()}})
 
 </script>
 </html>
