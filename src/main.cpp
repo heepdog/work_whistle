@@ -12,6 +12,7 @@
 #include <ESP8266WiFi.h>
 #include "timesetup.h"
 #include <LittleFS.h>
+#define ARDUINOJSON_ENABLE_COMMENTS 1
 #include <ArduinoJson.h>
 #include "utils.h"
 #include "alerts.h"
@@ -237,7 +238,7 @@ void loop() {
     sendTime();
 
     MoveCursorToLine(1);
-    
+
   }
 
  	if( tnow >= nextSecond ){

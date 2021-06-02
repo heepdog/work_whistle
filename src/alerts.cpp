@@ -1,4 +1,6 @@
 #include "alerts.h"
+#define ARDUINOJSON_ENABLE_COMMENTS 1
+
 #include "ArduinoJson.h"
 #include "Arduino.h"
 

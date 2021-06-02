@@ -9,3 +9,5 @@
         {"Name":"Saturday","abbreviation":"sat","Schedule":[{"Name":"Main","repeat":1}], "wday":6}
     ]
 }
+
+//{"Command":"DailySchedules","Monday":["Main"],"Tuesday":["Main"],"Wednesday":["Main"],"Thursday":["Main"],"Friday":["Main","Morning overtime","Evening overtime"],"Saturday":["Main"]}
