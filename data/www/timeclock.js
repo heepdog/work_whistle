@@ -114,6 +114,7 @@
     var item;
     var command;
     var item2;
+    var sendmsg = false;
     [ command, item, item2] = event.target.id.split("_")
     switch(command){
       case "EditSchedule":
@@ -124,11 +125,12 @@
         msg.Command = command;
         msg.Alert = item;
         msg.Schedule = item2;
+        sendmsg = true
         break;
       case "AddAlert":
         document.getElementById("formAdd").style.display="block";
         document.getElementById("ScheduleName").innerText = item
-
+      
         break;
       case "RemoveSchedule":
         break;
@@ -140,7 +142,10 @@
       webSocket = new WebSocket(gwUrl);
     }
 
-    webSocket.send(JSON.stringify(msg));
+    // webSocket.send(JSON.stringify(msg));
+    if (sendmsg){
+      waitForSocketConnection(webSocket, function(){webSocket.send(JSON.stringify(msg));})
+  }
 
 
 

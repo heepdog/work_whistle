@@ -7,11 +7,14 @@
 #include "utils.h"
 #include "alerts.h"
 
+#include <LittleFS.h>
+
 // Web server running on port 80
 AsyncWebServer server(80);
 // Web socket
 AsyncWebSocket ws("/ws");
 
+int saveSchedules(DynamicJsonDocument *);
 
 
 void sendTime(){
@@ -48,7 +51,7 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     // const char * const EditAlert("EditAlert");
     // const char * const EditSchedule("EditSchedule");
     // const char * const RemoveSchedule("RemoveSchedule");
-    // const char * const NewSchedule("NewSchedule");
+    const char * const NewSchedule("NewSchedule");
     // const char * const DeleteSchedule("DeleteSchedule");
      const char * const AddAlert("AddAlert");
     // const char * const AddSchedule("AddSchedule");
@@ -60,8 +63,9 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     // char buffer[1000];
 
     Serial.printf("data: %.*s\n",len, data);
-    // DynamicJsonDocument command(len);
-    StaticJsonDocument<500> command;
+
+    // Json object for the request from the connected client
+    DynamicJsonDocument command(500);
     deserializeJson(command,data);
     if(command[JsonCommandKey].as<String>() == DigitalCommand ){
       String pinNumber = command[JsonPinKey].as<String>();
@@ -96,19 +100,11 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     
     else if(command[JsonCommandKey].as<String>() == getSchedules ){
       Serial.printf("got \"%s\" \n", getSchedules);
-      response[JsonCommandKey] = "GetSchedules";
       Schedules.toJson(&response);
-      // response.shrinkToFit();
-      // Serial.printf("size of json doc: %d\n",response.memoryUsage());
-
-      // serializeJson(response,Serial);
-      // serializeJson(response,buffer);
-      // Serial.println("sending Response");
-      // client->text(buffer);
-      // Serial.println("done sending");
- 
-
-
+      // File schedulejson = LittleFS.open("schedules.json","w");
+      // serializeJsonPretty(response,schedulejson);
+      // saveSchedules(&response);
+      response[JsonCommandKey] = "GetSchedules";
     }
 
     else if(command[JsonCommandKey].as<String>() == DeleteAlert ){
@@ -116,26 +112,31 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
       String alertTime = command["Alert"];
       String scheduleName = command["Schedule"];
       response["Result"]= Schedules[scheduleName.c_str()]->removeAlert(alertTime.c_str());
-      response[JsonCommandKey] = "AddAlertResponse";
+      saveSchedules(&response);
+
+      response[JsonCommandKey] = "DeleteAlertResponse";
     }
+    
+    // Add Alert To Schedule
     else if(command[JsonCommandKey].as<String>() == AddAlert ){
       Serial.printf("got \"%s\" \n", AddAlert);
       response[JsonCommandKey] = "GetSchedules";
 
-      // {"Command":"AddAlert","Schedule":"Main","AlertTime":"07:42"}
       String scheduleName= command["Schedule"];
       String AlertTime = command["AlertTime"];
-      Schedules[scheduleName.c_str()]->addAlert(&AlertTime,15,AlertTone::SINGLE);
+      response["Result"] = Schedules[scheduleName.c_str()]->addAlert(&AlertTime,15,AlertTone::SINGLE);
+      saveSchedules(&response);
       Schedules.toJson(&scheduleName,&response);
     }
 
-
+    else if(command[JsonCommandKey].as<String>() == NewSchedule ){
+      
+    }
 
   response.shrinkToFit();
   size_t bufferLength = measureJson(response)+1;
   Serial.println("Creating buffer");
-  // AsyncWebSocketMessageBuffer *buffer = ws.makeBuffer(bufferLength) ;
-
+  //creates buffer for sending datat through the websocket
   void *buffer = malloc(bufferLength);
   if (buffer){
     Serial.println("Serealizing Json");
@@ -153,7 +154,12 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
   }
 
 }
-
+int saveSchedules(DynamicJsonDocument *json){
+  Schedules.toJson(json);
+  File schedulejson = LittleFS.open("schedules.json","w");
+  serializeJsonPretty(*json,schedulejson);
+  schedulejson.close();
+}
 // Callback for incoming event
 void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, 
              void * arg, uint8_t *data, size_t len){
@@ -183,6 +189,7 @@ void setupServer(){
   server.addHandler(&ws);
 
   server.serveStatic("/",LittleFS,"/www/");
+  server.serveStatic("debug/",LittleFS,"/");
 
   server.begin();
 }

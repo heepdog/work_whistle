@@ -90,10 +90,10 @@ void setup() {
     Schedules.addSchedule(Schedule(doc[JsonSchedulesKey][i].as<JsonObject>()));
   }
   
-  File file = LittleFS.open(configFileName,"r");
-  size_t filesize = file.size();
-  DynamicJsonDocument doc(filesize*2);
-  deserializeJson(doc, file);
+  file = LittleFS.open(configFileName,"r");
+  filesize = file.size();
+  DynamicJsonDocument doc2(filesize*2);
+  deserializeJson(doc2, file);
   file.close();
 
 
