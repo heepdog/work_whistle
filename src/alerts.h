@@ -55,8 +55,8 @@ class Schedule{
         int getId(){return id;};
         int GetAlertTotal(){return vectorAlerts.size();};
         void setId(int newID){id = newID;};
-        int addAlert(Alert);
-        int addAlert(const String* time, int durration, AlertTone tone);
+        bool addAlert(Alert);
+        bool addAlert(const String* time, int durration, AlertTone tone);
         int removeAlert(int index);
         int removeAlert(const char* alertName);
         int modifyAlert(int index, int durration, AlertTone tone);

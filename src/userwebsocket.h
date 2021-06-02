@@ -124,20 +124,30 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
       String scheduleName= command["Schedule"];
       String AlertTime = command["AlertTime"];
       response["Result"] = Schedules[scheduleName.c_str()]->addAlert(&AlertTime,15,AlertTone::SINGLE);
-      if(response["Result"] ==1){
+      if(response["Result"] == 1){
         saveSchedules(&response);
+        response[JsonCommandKey] = "GetSchedules";
+      } else{
+        response[JsonCommandKey] = "AddAlertError";
+        response["Schedule"] = scheduleName;
+        response["AlertTime"] = AlertTime;
       }
-      response[JsonCommandKey] = "GetSchedules";
+      
 
       // Schedules.toJson(&scheduleName,&response);
     }
 
     else if(command[JsonCommandKey].as<String>() == NewSchedule ){
-      response["Result"] = Schedules.addSchedule( Schedule( command["Name"].as<String>() ) );
-      if(response["Result"] ==1){
+      String scheduleName = command["Name"].as<String>();
+      response["Result"] = Schedules.addSchedule( Schedule( scheduleName ) );
+      if(response["Result"] == 1){
         saveSchedules(&response);
+        response[JsonCommandKey] = "GetSchedules";
+
+      } else{
+        response[JsonCommandKey] = "NewScheduleError";
+        response["Schedule"] = scheduleName;
       }
-      response[JsonCommandKey] = "GetSchedules";
 
     }
 
