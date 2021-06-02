@@ -25,13 +25,13 @@ Alert::Alert(int id, const String* time, int duration, const AlertTone tone){
 }
 
 Alert::Alert(const JsonObject jsonAlert){
-    setId(jsonAlert["id"]);
-    const String timeString = jsonAlert["time"];
+    setId(jsonAlert["Id"]);
+    const String timeString = jsonAlert["Time"];
     setTime(&timeString);
     // Serial.println(jsalert["time"].as<char*>());
-    setDuration(jsonAlert["duration"]);
+    setDuration(jsonAlert["Duration"]);
 
-    setTone(strcmp(jsonAlert["tone"],"pulse")==0?PULSE:SINGLE);
+    setTone(strcmp(jsonAlert["Tone"],"Pulse")==0?PULSE:SINGLE);
 }
 
 int Alert::setId(int id){
@@ -82,6 +82,9 @@ int Alert::operator==(const char* RHSAlert)  {
 AlertTone Alert::getTone(){
    return this->tone;
 }
+String Alert::getToneName(){
+   return "Pulse";
+}
 const String* Alert::getTime(){
     return &this->time;
 }
@@ -98,25 +101,25 @@ Schedule::Schedule(){
 
 Schedule::Schedule(const JsonObject  jsonalerts){ 
 
-    id = jsonalerts["id"].as<int>();
+    id = jsonalerts["Id"].as<int>();
     if (id == 0) {id = vectorAlerts.size();}
-    name = jsonalerts["name"].as<String>();
-    int number_of_alerts = jsonalerts["alerts"].size();
+    name = jsonalerts["Name"].as<String>();
+    int number_of_alerts = jsonalerts["Alerts"].size();
     for(int i= 0; i < number_of_alerts; i++){
-        Alert tmp = Alert(jsonalerts["alerts"][i].as<JsonObject>());
+        Alert tmp = Alert(jsonalerts["Alerts"][i].as<JsonObject>());
         if(tmp.getId() == 0 ) tmp.setId(5);
         addAlert(tmp);
     }
     // std::sort(vectorAlerts.begin(),vectorAlerts.end(), AlertSort);
 
 }
-bool Schedule::addAlert(const String* time, int durration, AlertTone tone){
+bool Schedule::addAlert(const String* time, int duration, AlertTone tone){
     Alert tmp;
     tmp.setTime(time);
-    tmp.setDuration(durration);
+    tmp.setDuration(duration);
     tmp.setTone(tone);
     tmp.setId(vectorAlerts.size() + 1);
-    // vectorAlerts.push_back(Alert(vectorAlerts.size()+1 , time, durration, tone));
+    // vectorAlerts.push_back(Alert(vectorAlerts.size()+1 , time, duration, tone));
     Serial.println(*time);
     return addAlert(tmp);
     // vectorAlerts.push_back(tmp);
@@ -137,23 +140,26 @@ bool Schedule::addAlert(Alert nextAlert){
 
 
 }
-int Schedule::removeAlert(int index){
+bool Schedule::removeAlert(int index){
     // alerts[index] = Null ;
-    vectorAlerts.erase(vectorAlerts.begin() + index);
+    if(0 <= index && index < (int) vectorAlerts.size()){
+        vectorAlerts.erase(vectorAlerts.begin() + index);
+        return true;
+    }
 
-    return 0;
+    return false;
 }
 
-int Schedule::removeAlert(const char* alertName){
+bool Schedule::removeAlert(const char* alertName){
 
     if (!hasAlertAtTime(alertName)){
         Serial.println(alertName);
         vectorAlerts.erase(std::find(vectorAlerts.begin(),vectorAlerts.end(),alertName)); 
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
-int Schedule::modifyAlert(int index, int durration, AlertTone tone){
+int Schedule::modifyAlert(int index, int duration, AlertTone tone){
 
     return 0;
    
@@ -190,8 +196,9 @@ void Schedule::toJSON(DynamicJsonDocument *buffer){
     (*buffer)["Name"] = name;
     for(size_t i = 0;i < vectorAlerts.size(); i++){
         (*buffer)["Alerts"][i]["Time"]  = *vectorAlerts[i].getTime();
-        (*buffer)["Alerts"][i]["Durration"]  = vectorAlerts[i].getDuration();
-        (*buffer)["Alerts"][i]["Tone"]  = vectorAlerts[i].getTone();
+        (*buffer)["Alerts"][i]["Duration"]  = vectorAlerts[i].getDuration();
+        (*buffer)["Alerts"][i]["Tone"]  = vectorAlerts[i].getToneName();
+        (*buffer)["Alerts"][i]["Id"]  = vectorAlerts[i].getId();
     }
 }
 
@@ -201,8 +208,9 @@ void mySchedules::toJson(DynamicJsonDocument *buffer){
 
         for(  int j = 0; j <schedules[i].GetAlertTotal(); j++){
             (*buffer)["Schedules"][i]["Alerts"][j]["Time"] = schedules[i][j]->getTime()->c_str();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Durration"] = schedules[i][j]->getDuration();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Tone"] = schedules[i][j]->getTone();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Duration"] = schedules[i][j]->getDuration();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Tone"] = schedules[i][j]->getToneName();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Id"] = schedules[i][j]->getId();
         }
     }
 
@@ -218,8 +226,9 @@ void mySchedules::toJson(String *scheduleName, DynamicJsonDocument *buffer){
 
         for(  int j = 0; j <schedules[i].GetAlertTotal(); j++){
             (*buffer)["Schedules"][i]["Alerts"][j]["Time"] = thisSchedule->operator[](j)->getTime()->c_str();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Durration"] = thisSchedule->operator[](j)->getDuration();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Tone"] = thisSchedule->operator[](j)->getTone();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Duration"] = thisSchedule->operator[](j)->getDuration();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Tone"] = thisSchedule->operator[](j)->getToneName();
+            (*buffer)["Schedules"][i]["Alerts"][j]["Id"] = thisSchedule->operator[](j)->getId();
         }
     }
 

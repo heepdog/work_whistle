@@ -1,5 +1,5 @@
 #ifndef USERWEBSOCKET_H
-#define USERwEBsOCKET_H
+#define USERWEBSOCKET_H
 #include <Arduino.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -14,7 +14,7 @@ AsyncWebServer server(80);
 // Web socket
 AsyncWebSocket ws("/ws");
 
-int saveSchedules(DynamicJsonDocument *);
+int saveSchedules(DynamicJsonDocument *, const char *);
 
 
 void sendTime(){
@@ -52,10 +52,10 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     // const char * const EditSchedule("EditSchedule");
     // const char * const RemoveSchedule("RemoveSchedule");
     const char * const NewSchedule("NewSchedule");
-    // const char * const DeleteSchedule("DeleteSchedule");
-     const char * const AddAlert("AddAlert");
+    const char * const DeleteSchedule("DeleteSchedule");
+    const char * const AddAlert("AddAlert");
     // const char * const AddSchedule("AddSchedule");
-    
+    // const char * const SchedulesFile("schedules.json");
     
 
     DynamicJsonDocument response(2000);
@@ -112,7 +112,7 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
       String alertTime = command["Alert"];
       String scheduleName = command["Schedule"];
       response["Result"]= Schedules[scheduleName.c_str()]->removeAlert(alertTime.c_str());
-      saveSchedules(&response);
+      saveSchedules(&response, SchedulesFile);
 
       response[JsonCommandKey] = "DeleteAlertResponse";
     }
@@ -125,7 +125,7 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
       String AlertTime = command["AlertTime"];
       response["Result"] = Schedules[scheduleName.c_str()]->addAlert(&AlertTime,15,AlertTone::SINGLE);
       if(response["Result"] == 1){
-        saveSchedules(&response);
+        saveSchedules(&response, SchedulesFile);
         response[JsonCommandKey] = "GetSchedules";
       } else{
         response[JsonCommandKey] = "AddAlertError";
@@ -141,7 +141,7 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
       String scheduleName = command["Name"].as<String>();
       response["Result"] = Schedules.addSchedule( Schedule( scheduleName ) );
       if(response["Result"] == 1){
-        saveSchedules(&response);
+        saveSchedules(&response, SchedulesFile);
         response[JsonCommandKey] = "GetSchedules";
 
       } else{
@@ -151,30 +151,47 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
 
     }
 
-  response.shrinkToFit();
-  size_t bufferLength = measureJson(response)+1;
-  Serial.println("Creating buffer");
-  //creates buffer for sending datat through the websocket
-  void *buffer = malloc(bufferLength);
-  if (buffer){
-    Serial.println("Serealizing Json");
-    serializeJson(response,buffer, bufferLength);
-    if(client){
-      Serial.println("Sending Json");
-      client->text((char *)buffer);
-      Serial.println("done sending json");
-    } else{
-      ws.textAll((char *)buffer);
+    else if (command[JsonCommandKey].as<String>() == DeleteSchedule){
+      Serial.printf("Recieved %s:",DeleteSchedule);
+      String scheduleName = command["Name"].as<String>();
+      response["Result"] =  Schedules.DeleteSchedule(scheduleName.c_str());
+      if(response["Result"] == 1){
+        saveSchedules(&response, SchedulesFile);
+        response[JsonCommandKey] = "GetSchedules";
+      } else{
+        response[JsonCommandKey] = "DeleteScheduleError";
+        response["Schedule"] = scheduleName;
+      }
+
+    }
+
+
+    {// Create buffer for serialized json, and send to Websocket client 
+      response.shrinkToFit();
+      size_t bufferLength = measureJson(response)+1;
+      Serial.println("Creating buffer");
+      //creates buffer for sending datat through the websocket
+      void *buffer = malloc(bufferLength);
+      if (buffer){
+        Serial.println("Serealizing Json");
+        serializeJson(response,buffer, bufferLength);
+        if(client){
+          Serial.println("Sending Json");
+          client->text((char *)buffer);
+          Serial.println("done sending json");
+        } else{
+          ws.textAll((char *)buffer);
+        }
+      }
+      free(buffer);
     }
   }
-  free(buffer);
-
-  }
-
 }
-int saveSchedules(DynamicJsonDocument *json){
+
+// Takes Pointer to a json document and saves it to filename
+int saveSchedules(DynamicJsonDocument *json, const char* filename){
   Schedules.toJson(json);
-  File schedulejson = LittleFS.open("schedules.json","w");
+  File schedulejson = LittleFS.open(filename,"w");
   serializeJsonPretty(*json,schedulejson);
   schedulejson.close();
   return 1;

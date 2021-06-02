@@ -73,16 +73,17 @@ webSocket.onmessage = function(e) {
     else if(jsondata.Command == "GetSchedules"){
       delete jsondata.command;
       var scheduleList = document.getElementsByClassName("weekday-list");
-      //scheduleList[0].innerHTML = ""
       if (jsondata.Schedules){
       for(var scheduleName of jsondata.Schedules){
+          var InitialElement = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="AddAlert_${scheduleName.Name}">Add Alert</div><div class="list-item-edit" id="DeleteSchedule_${scheduleName.Name}">Delete Schedule</div>`;
+
           var el = document.getElementById(scheduleName.Name);
           if (el){
-            el.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="AddAlert_${scheduleName.Name}">Add Alert</div></div>`;
+            el.innerHTML = InitialElement;
           } else {
               
             var el  = document.createElement("li");
-            el.innerHTML = `${scheduleName.Name}<div class="edit-block"><div class="list-item-edit" id="AddAlert_${scheduleName.Name}">Add Alert</div></div>`;
+            el.innerHTML = InitialElement;
             el.id = scheduleName.Name;
             el.classList.add("weekday-list-item");
             scheduleList[0].appendChild(el);
@@ -95,7 +96,7 @@ webSocket.onmessage = function(e) {
                                                             <li class="alert-list-item">
                                                               <span class="alert">
                                                                 <span class="alert-time">${timestr}</span>
-                                                                <span class="alert-durration">${alert.Durration}</span>
+                                                                <span class="alert-duration">${alert.Duration}</span>
                                                                 <span class="alert-tone">${alert.Tone}</span>
                                                               </span>
                                                               <div class="edit-block"><div class="list-item-edit" id="EditAlert_${alert.Time}_${scheduleName.Name}">edit</div><div class="list-item-edit"id="DeleteAlert_${alert.Time}_${scheduleName.Name}">delete</div></div>
@@ -136,11 +137,17 @@ function addScheduleToDay(event){
       document.getElementById("ScheduleName").innerText = item;
     
       break;
-      case "RemoveSchedule":
-        break;
-      case "AddSchedule":
-        break;
-        default:
+    case "DeleteSchedule":
+      event.target.parentElement.parentElement.remove();
+      msg.Command = command;
+      msg.Name = item;
+      sendmsg = true;
+      break;
+    case "RemoveSchedule":
+      break;
+    case "AddSchedule":
+      break;
+      default:
       console.log(`${command} not found`);
   }
   

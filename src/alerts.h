@@ -18,6 +18,7 @@ class Alert{
         int getMinutes(); // returs the minute of the alert
         int getDuration();  // sets how long the alert should last
         AlertTone getTone();  //sets how the alert tone should sound
+        String getToneName();
         int getId();
         int setId(int id); 
         int setTime(const String* time);
@@ -56,10 +57,10 @@ class Schedule{
         int GetAlertTotal(){return vectorAlerts.size();};
         void setId(int newID){id = newID;};
         bool addAlert(Alert);
-        bool addAlert(const String* time, int durration, AlertTone tone);
-        int removeAlert(int index);
-        int removeAlert(const char* alertName);
-        int modifyAlert(int index, int durration, AlertTone tone);
+        bool addAlert(const String* time, int duration, AlertTone tone);
+        bool removeAlert(int index);
+        bool removeAlert(const char* alertName);
+        int modifyAlert(int index, int duration, AlertTone tone);
         const String* GetAlertTime(int index);
         AlertTone getAlertTone(int index);
         int getAlertDuration(int index); 
@@ -119,6 +120,19 @@ class mySchedules{
       return std::find<std::vector<Schedule>::iterator>(schedules.begin(),schedules.end(),searchname) != schedules.end();
   }
 
+  bool DeleteSchedule(const char* schedName){
+    std::vector<Schedule>::iterator del = getSchedule(schedName);
+    if(del != schedules.end()){
+    for (int i = del->GetAlertTotal()-1; i >= 0; i--){
+        del->removeAlert(i);
+    }
+    del->debugPrintTimes();
+    schedules.erase(del);
+    return true;
+    }
+    return false;
+  }
+
 };
 extern mySchedules Schedules;
 
@@ -136,7 +150,7 @@ class ScheduleItems{
     ScheduleItems(){name= ""; isrepeating = 0;};
     ScheduleItems(JsonObject const jsonAlert){
         setName(jsonAlert[F("Name")]); 
-        isrepeating = jsonAlert[F("repeat")];
+        isrepeating = jsonAlert[F("Repeat")];
     };
     void print(){Serial.printf("name: %s, repeating %d\n", name.c_str(), isrepeating);}
 

@@ -1,23 +1,23 @@
 {"Schedules":[
-    {"id":1, "name":"Main","alerts":[
-        {"id":1,"time":"6:00","duration":15,"tone":"pulse"},
-        {"id":3,"time":"8:15","duration":15,"tone":"pulse"},
-        {"id":4,"time":"10:15","duration":5, "tone":"single"},
-        {"id":5,"time":"10:30","duration":15,"tone":"pulse"},
-        {"id":6,"time":"12:30","duration":5, "tone":"single"},
-        {"id":7,"time":"13:00","duration":15,"tone":"pulse"},
-        {"id":2,"time":"8:00","duration":5,"tone":"single"},
-        {"id":8,"time":"15:00","duration":5,"tone":"single"}
+    {"Id":1, "Name":"Main","Alerts":[
+        {"Id":1,"Time":"6:00","Duration":15,"Tone":"Pulse"},
+        {"Id":3,"Time":"8:15","Duration":15,"Tone":"Pulse"},
+        {"Id":4,"Time":"10:15","Duration":5, "Tone":"Single"},
+        {"Id":5,"Time":"10:30","Duration":15,"Tone":"Pulse"},
+        {"Id":6,"Time":"12:30","Duration":5, "Tone":"Single"},
+        {"Id":7,"Time":"13:00","Duration":15,"Tone":"Pulse"},
+        {"Id":2,"Time":"8:00","Duration":5,"Tone":"Single"},
+        {"Id":8,"Time":"15:00","Duration":5,"Tone":"Single"}
         ]
     },
-    {"name":"Morning overtime","alerts":[
-        {"id":1,"time":"5:00","duration":6,"tone":"pulse"},
-        {"id":2,"time":"7:45","duration":3,"tone":"single"}
+    {"Name":"Morning overtime","Alerts":[
+        {"Id":1,"Time":"5:00","Duration":6,"Tone":"Pulse"},
+        {"Id":2,"Time":"7:45","Duration":3,"Tone":"Single"}
         ]
     },
-    {"id":3, "name":"Evening overtime","alerts":[
-        {"id":2,"time":"15:15","duration":3,"tone":"single"},
-        {"id":2,"time":"7:45","duration":3,"tone":"single"}
+    {"Id":3, "Name":"Evening overtime","Alerts":[
+        {"Id":1,"Time":"15:15","Duration":3,"Tone":"Single"},
+        {"Id":2,"Time":"7:45","Duration":3,"Tone":"Single"}
         ]
     }
     ]

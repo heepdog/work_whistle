@@ -1,0 +1,11 @@
+{
+    "Days":[
+        {"Name":"Sunday","abbreviation":"sun","Schedule":[], "wday":0},
+        {"Name":"Monday","abbreviation":"mon","Schedule":[{"Name":"Main","repeat":1}], "wday":1},
+        {"Name":"Tuesday","abbreviation":"tue","Schedule":[{"Name":"Main","repeat":1}], "wday":2},
+        {"Name":"Wednesday","abbreviation":"wed","Schedule":[{"Name":"Main","repeat":1}], "wday":3},
+        {"Name":"Thursday","abbreviation":"thu","Schedule":[{"Name":"Main","repeat":1}], "wday":4},
+        {"Name":"Friday","abbreviation":"fri","Schedule":[{"Name":"Main","repeat":1},{"Name":"Morning overtime","repeat":0},{"Name":"Evening overtime","repeat":1}], "wday":5},
+        {"Name":"Saturday","abbreviation":"sat","Schedule":[{"Name":"Main","repeat":1}], "wday":6}
+    ]
+}

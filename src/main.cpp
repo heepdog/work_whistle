@@ -44,15 +44,30 @@ ESP8266WiFiMulti wifiMulti;
 
 const char* const configFileName PROGMEM =  "/config.json";
 const char* const JsonSchedulesKey PROGMEM =  "Schedules";
-const char* const JsonScheduleKey PROGMEM =  "schedule";
-const char* const JsonNameKey PROGMEM =  "name";
-const char* const JsonDaysKey PROGMEM =  "days";
+const char* const JsonScheduleKey PROGMEM =  "Schedule";
+const char* const JsonNameKey PROGMEM =  "Name";
+const char* const JsonDaysKey PROGMEM =  "Days";
 
 // #define configFileName  "/config.json"
 // #define JsonSchedulesKey "Schedules"
 // #define JsonScheduleKey   "schedule"
 // #define JsonNameKey  "name"
 // #define JsonDaysKey  "days"
+
+DynamicJsonDocument readFile(const char* filename){
+  
+  File file = LittleFS.open(filename,"r");
+  size_t filesize = file.size();
+  Serial.println(filesize);
+  DynamicJsonDocument doc(filesize*2);
+  deserializeJson(doc, file);
+  Serial.println(doc.overflowed());
+  serializeJsonPretty(doc,Serial);
+  file.close();
+  return doc;
+
+
+}
 
 
 void setup() {
@@ -76,11 +91,11 @@ void setup() {
 
 
 
-  File file = LittleFS.open(configFileName,"r");
-  size_t filesize = file.size();
-  DynamicJsonDocument doc(filesize*2);
-  deserializeJson(doc, file);
-  file.close();
+  // File file = LittleFS.open(configFileName,"r");
+  // size_t filesize = file.size();
+  DynamicJsonDocument doc = readFile(SchedulesFile);
+  // deserializeJson(doc, file);
+  // file.close();
   // doc.shrinkToFit();
 
 
@@ -89,28 +104,36 @@ void setup() {
   for( int i = 0; i < numberSchedules; i++){
     Schedules.addSchedule(Schedule(doc[JsonSchedulesKey][i].as<JsonObject>()));
   }
+
+  doc.clear();
+  doc.shrinkToFit();
   
-  file = LittleFS.open(configFileName,"r");
-  filesize = file.size();
-  DynamicJsonDocument doc2(filesize*2);
-  deserializeJson(doc2, file);
-  file.close();
+  // File file = LittleFS.open(configFileName,"r");
+  // size_t filesize = file.size();
+  // DynamicJsonDocument doc2(filesize*2);
+  // deserializeJson(doc2, file);
+  // file.close();
+
+  DynamicJsonDocument doc2 = readFile(DailyScheduleFile);
 
 
 // Iterates through all of the days and adds the schedules that sould be run for each day
   for( int day = 0 ; day < 7; day++){
-    dailyList[day].dayName =  doc[JsonDaysKey][day][JsonNameKey].as<String>();
-    for( size_t item = 0; item < doc[JsonDaysKey][day][JsonScheduleKey].size(); item++){
-      dailyList[day].AddSchedule(doc[JsonDaysKey][day][JsonScheduleKey][item].as<JsonObject>());
+    dailyList[day].dayName =  doc2[JsonDaysKey][day][JsonNameKey].as<String>();
+    for( size_t item = 0; item < doc2[JsonDaysKey][day][JsonScheduleKey].size(); item++){
+      dailyList[day].AddSchedule(doc2[JsonDaysKey][day][JsonScheduleKey][item].as<JsonObject>());
     }
   }
 
-  char* newName = (char*)"New Schedule";
+  doc.clear();
+  doc.shrinkToFit();
+
+  // char* newName = (char*)"New Schedule";
   
-  String time1 = "1:00";
-  String time2 = "14:00";
-  Schedules.addSchedule(Schedule(newName));
-  Schedules[newName]->addAlert(&time2,1,AlertTone::SINGLE);
+  // String time1 = "1:00";
+  // String time2 = "14:00";
+  // Schedules.addSchedule(Schedule(newName));
+  // Schedules[newName]->addAlert(&time2,1,AlertTone::SINGLE);
 
   wifiMulti.addAP(SSID,SSIDPWD);
   wifiMulti.addAP(SSID2,SSIDPWD2);
@@ -214,12 +237,7 @@ void loop() {
     sendTime();
 
     MoveCursorToLine(1);
-
-
-
-
-
-
+    
   }
 
  	if( tnow >= nextSecond ){

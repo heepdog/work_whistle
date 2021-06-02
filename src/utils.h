@@ -1,3 +1,6 @@
+#ifndef UTILS_H
+#define UTILS_H
+
 #include <time.h>                       // time() ctime()
 
 #define SEROUT
@@ -45,3 +48,8 @@ void printTm(const char* what, const tm* tm);
 
 #define CMP_DEFN(PINDEF,PINSTR) String(#PINDEF) == PINSTR
 #define PIN_TO_JSON_STATUS(PINDEF) "{ \"command\" : \"update\", \"pin\":\"" #PINDEF "\",\"value\": \"%d\" }", digitalRead(PINDEF)
+
+const char * const SchedulesFile("schedules.json");
+const char * const DailyScheduleFile("days.json");
+
+#endif
