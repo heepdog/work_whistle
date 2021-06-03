@@ -38,7 +38,7 @@ void notifyClient(int status) {
 
 void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketClient *client) {
 
-  #define debugprintcommand(x)  CSFromCursorDown(); Serial.print("got \"");Serial.print(FPSTR(x));Serial.println("\"");
+  #define debugprintcommand(x)  //CSFromCursorDown(); Serial.print("got \"");Serial.print(FPSTR(x));Serial.println("\"");
 
 
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
@@ -175,6 +175,31 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
 
     }
 
+    else if (command[FPSTR(JSONCOMMANDKEY)].as<String>() == F("AddSchedule")){
+      for (size_t i = 0; i < Schedules.schedules.size(); i++){
+        response[FPSTR(SCHEDULES)][i] = Schedules[i]->getName()->c_str();
+      }
+      response[FPSTR(JSONCOMMANDKEY)] = F("SendScheduleNames");
+      response[F("Day")] = command[F("Day")];
+
+    }
+    else if (command[FPSTR(JSONCOMMANDKEY)].as<String>() == F("AddScheduleToDay")){
+      Serial.println(command[F("Day")].as<String>());
+      Serial.println(dailyList[1].hasSchedule(command[FPSTR(SCHEDULE)][F("Name")].as<String>().c_str()));
+      dailyList[0].AddSchedule(ScheduleItems(command[FPSTR(SCHEDULE)].as<JsonObject>()));
+      
+      response[FPSTR(JSONCOMMANDKEY)] = FPSTR(DAILYSCHEDULES);
+
+      for (int i = 0 ; i < 7; i++){
+          for( size_t j = 0 ; j < dailyList[i].listsize; j++){
+            response[dailyList[i].dayName.c_str ()][j] = dailyList[i].list[j].getName()->c_str();
+          }
+      }
+
+
+
+    }
+
 
     {// Create buffer for serialized json, and send to Websocket client 
       response.shrinkToFit();
@@ -204,7 +229,7 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
 int saveSchedules(DynamicJsonDocument *json, const char* filename){
   Schedules.toJson(json);
   File schedulejson = LittleFS.open(filename,"w");
-  serializeJsonPretty(*json,schedulejson);
+  serializeJson(*json,schedulejson);
   schedulejson.close();
   return 1;
 }

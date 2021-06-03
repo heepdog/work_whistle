@@ -79,12 +79,31 @@ limitations under the License.
 
     </div>
 
-    <button onclick="fetchMessage()">Fetch Message</button>
-    <p id="message">Click on the button to fetch the message.</p>
+    <!-- This is the modal form to add a schedule to a day -->
+    <div id="AddScheduleModal" class="modal">
+        <div class="add-alert-content">
+            <span class="modal-close">&times;</span>
+            <form id="AddScheduleForm">
+                <label for="AddScheduleName">Schedule to add</label><input type="hidden" id="DayName"><select name="AddScheduleName" id="AddScheduleName"><option>one</option><option>two</option><option>three</option></select>
+                <input type="button" value="Submit" id="AddScheduleNameSubmit">
+            </form>
+        </div>
+    </div>
+
 </body>
 
 <script>
     // document.getElementById("sunday_add").addEventListener("click", addScheduleToDay);
     document.getElementsByClassName("weekday-list")[0].addEventListener("click", addScheduleToDay);
+    document.getElementsByClassName("modal-close")[0].addEventListener("click", HideModal);
+
+    document.getElementById("AddScheduleForm").addEventListener("submit",function(event){event.preventDefault();});
+    document.getElementById("AddScheduleNameSubmit").addEventListener("click",AddSchedule);
+    // document.getElementById("NewScheduleName").addEventListener("keyup",function (event) {if(event.keyCode ===13){event.preventDefault();document.getElementById("NewScheduleNameSubmit").click()}});
+
+
+    window.addEventListener("click", function() {if(event.target.className == "modal"){HideModal()}})
+
+
 </script>
 </html>

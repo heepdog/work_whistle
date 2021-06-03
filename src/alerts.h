@@ -63,9 +63,10 @@ class Alert{
     
 };
 
+__attribute__((unused)) //used in the Alert::addAlert function to  sort lerts by time
 struct {
     bool operator()(Alert a, Alert b) { return a < b; }
-} AlertSort;
+}  AlertSort;
 
 
 class Schedule{
@@ -167,6 +168,7 @@ class ScheduleItems{
     bool getRepeating() {return isrepeating;}; 
     void setName(const String newname){this->name = newname; };
     void setRepeating(const bool repeat);
+    int operator==(const char* rhs){return this->name == rhs;};
 
     ScheduleItems(){name= ""; isrepeating = 0;};
     ScheduleItems(JsonObject const jsonAlert){
@@ -183,6 +185,7 @@ struct weeklyDailyList{
     size_t listsize=0;
     String dayName;
     
+    bool hasSchedule(const char* name){return std::find(list.begin(),list.end(), name) != list.end();}
     void AddSchedule(ScheduleItems item){list.push_back(item);listsize++;};
     void AddSchedule(JsonObject const jsonAlert){list.push_back(ScheduleItems(jsonAlert));listsize++;};
     void print(){Serial.print(F("Next List -> "));Serial.println(dayName); for (size_t i = 0; i < listsize; i++){Serial.print("\t");list[i].print();}}

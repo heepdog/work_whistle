@@ -65,11 +65,16 @@ limitations under the License.
     // hides the addAlert modal if the close button is clicked or the form is clicked off
     document.getElementsByClassName("modal-close")[0].addEventListener("click", HideModal);
     // submit button to send data to add an alert to the server
+    document.getElementById("AddAlertForm").addEventListener("submit",function(event){event.preventDefault();});
     document.getElementById("alertAddSubmit").addEventListener("click",AddAlertToSchedule);
+    document.getElementById("alertTime").addEventListener("keyup",function (event) {if(event.keyCode ===13){event.preventDefault();document.getElementById("alertAddSubmit").click()}});
     // shows the new schedule modal form to create a new schedule
     document.getElementById("NewScheduleModalbutton").addEventListener("click", function (){document.getElementById("NewScheduleModal").style.display = "block";} );
     document.getElementsByClassName("modal-close")[1].addEventListener("click", HideModal);
+    // submit button to send data to create a new schedule
+    document.getElementById("NewScheduleForm").addEventListener("submit",function(event){event.preventDefault();});
     document.getElementById("NewScheduleNameSubmit").addEventListener("click",NewSchedule);
+    document.getElementById("NewScheduleName").addEventListener("keyup",function (event) {if(event.keyCode ===13){event.preventDefault();document.getElementById("NewScheduleNameSubmit").click()}});
 
     window.addEventListener("click", function() {if(event.target.className == "modal"){HideModal()}})
 

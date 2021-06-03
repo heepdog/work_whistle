@@ -55,7 +55,7 @@ webSocket.onmessage = function(e) {
             elem.innerHTML = elem.innerHTML + `<li class="daily-list-item">${scheduleName}
                                                 <div class="edit-block">
                                                   <div class="list-item-edit" id="EditSchedule_${scheduleName}">edit</div>
-                                                  <div class="list-item-edit"id="RemoveSchedule_${scheduleName}">remove</div>
+                                                  <div class="list-item-edit"id="RemoveSchedule_${scheduleName}_${day.id}">remove</div>
                                                 </div>
                                               </li>`;
 
@@ -108,6 +108,19 @@ webSocket.onmessage = function(e) {
         }
       }
     }
+    else if(jsondata.Command == "SendScheduleNames"){
+      console.log(jsondata);
+      el = document.getElementById("AddScheduleName");
+      el.innerHTML = "";
+      for(var name of jsondata.Schedules){
+        console.log(name)
+        var opt = document.createElement("option")
+        opt.innerText = name;
+        el.add(opt);        
+      }
+      document.getElementById("DayName").value = jsondata.Day
+
+    }
   }
 }
 
@@ -146,8 +159,12 @@ function addScheduleToDay(event){
     case "RemoveSchedule":
       break;
     case "AddSchedule":
+      document.getElementById("AddScheduleModal").style.display = "block";
+      msg.Command = command;
+      msg.Day = item;
+      sendmsg = true;
       break;
-      default:
+    default:
       console.log(`${command} not found`);
   }
   
@@ -202,12 +219,16 @@ function get12HrString(timestr){
 
 //Functions to show and submit modal forms
 function HideModal(){
-  document.getElementsByClassName("modal")[0].style.display = "none";
-  document.getElementsByClassName("modal")[1].style.display = "none";
+  for (item of document.getElementsByClassName("modal")){
+    item.style.display = "none"
+  }
+  // document.getElementsByClassName("modal")[0].style.display = "none";
+  // document.getElementsByClassName("modal")[1].style.display = "none";
 }
 
 //Sends data to server to create a new alert on the Schedule
 function AddAlertToSchedule(event){
+  event.preventDefault();
   var time = (document.getElementById("alertTime").value);
   var schedule = (document.getElementById("ScheduleName").innerText);
   HideModal();
@@ -217,10 +238,26 @@ function AddAlertToSchedule(event){
 
 // sends datat to the sterver to create a new Schedule
 function NewSchedule(event){
+  event.preventDefault();
   var scheduleName = document.getElementById("NewScheduleName").value;
   console.log(scheduleName);
-  HideModal()
+  HideModal();
   var msg = { Command: "NewSchedule", Name: scheduleName, Date: Date.now()};
+  webSocket.send(JSON.stringify(msg));
+
+}
+
+function AddSchedule(event){
+  HideModal()
+  console.log(event);
+  HideModal();
+
+  // {"Name":"Main","repeat":1}
+  var msg = { Command: "AddScheduleToDay", Date: Date.now()};
+  var schedule = {Name: document.getElementById("AddScheduleName").value, Repeat: 0};
+  msg.Day = document.getElementById("DayName").value;
+  msg.Schedule = schedule;
+  console.log(msg);
   webSocket.send(JSON.stringify(msg));
 
 }
