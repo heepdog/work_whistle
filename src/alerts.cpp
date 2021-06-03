@@ -27,13 +27,13 @@ Alert::Alert(int id, const String* time, int duration, const AlertTone tone){
 }
 
 Alert::Alert(const JsonObject jsonAlert){
-    setId(jsonAlert["Id"]);
-    const String timeString = jsonAlert["Time"];
+    setId(jsonAlert[FPSTR(ID)]);
+    const String timeString = jsonAlert[FPSTR(TIME)];
     setTime(&timeString);
     // Serial.println(jsalert["time"].as<char*>());
-    setDuration(jsonAlert["Duration"]);
+    setDuration(jsonAlert[FPSTR(DURATION)]);
 
-    setTone(strcmp(jsonAlert["Tone"],"Pulse")==0?PULSE:SINGLE);
+    setTone(strcmp(jsonAlert[FPSTR(TONE)],"Pulse")==0?PULSE:SINGLE);
 }
 
 int Alert::setId(int id){
@@ -85,7 +85,7 @@ AlertTone Alert::getTone(){
    return this->tone;
 }
 String Alert::getToneName(){
-   return "Pulse";
+   return this->tone?"Pulse":"Single";
 }
 const String* Alert::getTime(){
     return &this->time;
@@ -103,12 +103,12 @@ Schedule::Schedule(){
 
 Schedule::Schedule(const JsonObject  jsonalerts){ 
 
-    id = jsonalerts["Id"].as<int>();
+    id = jsonalerts[FPSTR(ID)].as<int>();
     if (id == 0) {id = vectorAlerts.size();}
-    name = jsonalerts["Name"].as<String>();
-    int number_of_alerts = jsonalerts["Alerts"].size();
+    name = jsonalerts[FPSTR(NAME)].as<String>();
+    int number_of_alerts = jsonalerts[FPSTR(ALERTS)].size();
     for(int i= 0; i < number_of_alerts; i++){
-        Alert tmp = Alert(jsonalerts["Alerts"][i].as<JsonObject>());
+        Alert tmp = Alert(jsonalerts[FPSTR(ALERTS)][i].as<JsonObject>());
         if(tmp.getId() == 0 ) tmp.setId(5);
         addAlert(tmp);
     }
@@ -195,24 +195,24 @@ void Schedule::debugPrintTimes(){
 
 void Schedule::toJSON(DynamicJsonDocument *buffer){
     //DynamicJsonDocument JsonSchedule(200);
-    (*buffer)["Name"] = name;
+    (*buffer)[FPSTR(NAME)] = name;
     for(size_t i = 0;i < vectorAlerts.size(); i++){
-        (*buffer)["Alerts"][i]["Time"]  = *vectorAlerts[i].getTime();
-        (*buffer)["Alerts"][i]["Duration"]  = vectorAlerts[i].getDuration();
-        (*buffer)["Alerts"][i]["Tone"]  = vectorAlerts[i].getToneName();
-        (*buffer)["Alerts"][i]["Id"]  = vectorAlerts[i].getId();
+        (*buffer)[FPSTR(ALERTS)][i][FPSTR(TIME)]  = *vectorAlerts[i].getTime();
+        (*buffer)[FPSTR(ALERTS)][i][FPSTR(DURATION)]  = vectorAlerts[i].getDuration();
+        (*buffer)[FPSTR(ALERTS)][i][FPSTR(TONE)]  = vectorAlerts[i].getToneName();
+        (*buffer)[FPSTR(ALERTS)][i][FPSTR(ID)]  = vectorAlerts[i].getId();
     }
 }
 
 void mySchedules::toJson(DynamicJsonDocument *buffer){
     for(size_t i = 0; i<schedules.size();i++){
-        (*buffer)["Schedules"][i]["Name"] = schedules[i].getName()->c_str();
+        (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(NAME)] = schedules[i].getName()->c_str();
 
         for(  int j = 0; j <schedules[i].GetAlertTotal(); j++){
-            (*buffer)["Schedules"][i]["Alerts"][j]["Time"] = schedules[i][j]->getTime()->c_str();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Duration"] = schedules[i][j]->getDuration();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Tone"] = schedules[i][j]->getToneName();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Id"] = schedules[i][j]->getId();
+            (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(ALERTS)][j][FPSTR(TIME)] = schedules[i][j]->getTime()->c_str();
+            (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(ALERTS)][j][FPSTR(DURATION)] = schedules[i][j]->getDuration();
+            (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(ALERTS)][j][FPSTR(TONE)] = schedules[i][j]->getToneName();
+            (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(ALERTS)][j][FPSTR(ID)] = schedules[i][j]->getId();
         }
     }
 
@@ -223,14 +223,14 @@ void mySchedules::toJson(String *scheduleName, DynamicJsonDocument *buffer){
         int i = 0;
         auto thisSchedule = getSchedule(scheduleName->c_str());
 
-        (*buffer)["Schedules"][i]["Name"] = thisSchedule->getName()->c_str();
+        (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(NAME)] = thisSchedule->getName()->c_str();
         thisSchedule->operator[](1);
 
         for(  int j = 0; j <schedules[i].GetAlertTotal(); j++){
-            (*buffer)["Schedules"][i]["Alerts"][j]["Time"] = thisSchedule->operator[](j)->getTime()->c_str();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Duration"] = thisSchedule->operator[](j)->getDuration();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Tone"] = thisSchedule->operator[](j)->getToneName();
-            (*buffer)["Schedules"][i]["Alerts"][j]["Id"] = thisSchedule->operator[](j)->getId();
+            (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(ALERTS)][j][FPSTR(TIME)] = thisSchedule->operator[](j)->getTime()->c_str();
+            (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(ALERTS)][j][FPSTR(DURATION)] = thisSchedule->operator[](j)->getDuration();
+            (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(ALERTS)][j][FPSTR(TONE)] = thisSchedule->operator[](j)->getToneName();
+            (*buffer)[FPSTR(SCHEDULES)][i][FPSTR(ALERTS)][j][FPSTR(ID)] = thisSchedule->operator[](j)->getId();
         }
     }
 

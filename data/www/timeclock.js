@@ -55,7 +55,7 @@ webSocket.onmessage = function(e) {
             elem.innerHTML = elem.innerHTML + `<li class="daily-list-item">${scheduleName}
                                                 <div class="edit-block">
                                                   <div class="list-item-edit" id="EditSchedule_${scheduleName}">edit</div>
-                                                  <div class="list-item-edit"id="DeleteSchedule_${scheduleName}">delete</div>
+                                                  <div class="list-item-edit"id="RemoveSchedule_${scheduleName}">remove</div>
                                                 </div>
                                               </li>`;
 

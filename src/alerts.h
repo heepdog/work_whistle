@@ -7,6 +7,25 @@
 
 enum AlertTone{ PULSE, SINGLE };
 
+
+static const char ID[] PROGMEM = "Id";
+static const char NAME[] PROGMEM = "Name";
+static const char TIME[] PROGMEM = "Time";
+static const char DURATION[] PROGMEM = "Duration";
+static const char PULSESTR[] PROGMEM = "Pulse";
+static const char SINGLESTR[] PROGMEM = "Single";
+static const char TONE[] PROGMEM = "Tone";
+static const char ALERTS[] PROGMEM = "Alerts";
+static const char ALERT[] PROGMEM = "Alert";
+static const char SCHEDULES[] PROGMEM = "Schedules";
+static const char SCHEDULE[] PROGMEM = "Schedule";
+static const char REPEAT[] PROGMEM = "Repeat";
+
+
+
+
+
+
 class Alert{
     public:
         Alert();
@@ -142,6 +161,7 @@ class ScheduleItems{
     String name;
     bool isrepeating;
 
+
     public:
     String* getName() {return &name;};
     bool getRepeating() {return isrepeating;}; 
@@ -150,8 +170,8 @@ class ScheduleItems{
 
     ScheduleItems(){name= ""; isrepeating = 0;};
     ScheduleItems(JsonObject const jsonAlert){
-        setName(jsonAlert[F("Name")]); 
-        isrepeating = jsonAlert[F("Repeat")];
+        setName(jsonAlert[FPSTR(NAME)]); 
+        isrepeating = jsonAlert[FPSTR(REPEAT)];
     };
     void print(){Serial.printf("name: %s, repeating %d\n", name.c_str(), isrepeating);}
 

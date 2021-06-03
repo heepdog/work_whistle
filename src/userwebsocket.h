@@ -37,26 +37,32 @@ void notifyClient(int status) {
 }
 
 void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketClient *client) {
+
+  #define debugprintcommand(x)  CSFromCursorDown(); Serial.print("got \"");Serial.print(FPSTR(x));Serial.println("\"");
+
+
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
 
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
 
-    const char * const JsonDataKey("Data");
-    const char * const JsonCommandKey("Command");
-    const char * const JsonPinKey("Pin");
-    const char * const DigitalCommand("DigitalWrite");
-    const char * const getDailySchedules("GetDailySchedules");
-    const char * const getSchedules("GetSchedules");
-    const char * const DeleteAlert("DeleteAlert");
+    static const char JSONDATAKEY[] PROGMEM = "Data";
+    static const char JSONCOMMANDKEY[] PROGMEM  = "Command";
+    static const char JSONPINKEY[] PROGMEM = "Pin";
+    static const char GETDAILYSCHEDULES[] PROGMEM = "GetDailySchedules";
+    static const char DAILYSCHEDULES[] PROGMEM = "DailySchedules";
+    static const char GETSCHEDULES[] PROGMEM = "GetSchedules";
+    static const char RESULT[] PROGMEM = "Result";
+    static const char ALERTTIME[] PROGMEM = "AlertTime";
+    static const char DELETEALERT[] PROGMEM = "DeleteAlert";
     // const char * const EditAlert("EditAlert");
     // const char * const EditSchedule("EditSchedule");
     // const char * const RemoveSchedule("RemoveSchedule");
-    const char * const NewSchedule("NewSchedule");
-    const char * const DeleteSchedule("DeleteSchedule");
-    const char * const AddAlert("AddAlert");
+    static const char NEWSCHEDULE[] PROGMEM = "NewSchedule";
+    static const char DELETESCHEDULE[] = "DeleteSchedule";
+    static const char ADDALERT[] PROGMEM = "AddAlert";
     // const char * const AddSchedule("AddSchedule");
     // const char * const SchedulesFile("schedules.json");
-    
+    const char * const DigitalCommand("DigitalWrite");
 
     DynamicJsonDocument response(2000);
     // JsonObject &response = jsonBuffer.createOLbject();
@@ -67,9 +73,9 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     // Json object for the request from the connected client
     DynamicJsonDocument command(500);
     deserializeJson(command,data);
-    if(command[JsonCommandKey].as<String>() == DigitalCommand ){
-      String pinNumber = command[JsonPinKey].as<String>();
-      int value = command[JsonDataKey].as<int>();
+    if(command[FPSTR(JSONCOMMANDKEY)].as<String>() == DigitalCommand ){
+      String pinNumber = command[FPSTR(JSONPINKEY)].as<String>();
+      int value = command[FPSTR(JSONDATAKEY)].as<int>();
 
       if (CMP_DEFN(D4, pinNumber))
         digitalWrite(D4, value);
@@ -83,9 +89,9 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
         digitalWrite(LED_BUILTIN, value);
     }
     
-    else if(command[JsonCommandKey].as<String>() == getDailySchedules ){
-      Serial.printf("got \"%s\" \n", getDailySchedules);
-      response[JsonCommandKey] = "DailySchedules";
+    else if(command[FPSTR(JSONCOMMANDKEY)].as<String>() == FPSTR(GETDAILYSCHEDULES) ){
+      debugprintcommand(GETDAILYSCHEDULES);
+      response[FPSTR(JSONCOMMANDKEY)] = FPSTR(DAILYSCHEDULES);
 
       for (int i = 0 ; i < 7; i++){
           for( size_t j = 0 ; j < dailyList[i].listsize; j++){
@@ -98,69 +104,73 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
       // client->printf(buffer);
     }
     
-    else if(command[JsonCommandKey].as<String>() == getSchedules ){
-      Serial.printf("got \"%s\" \n", getSchedules);
+    else if(command[FPSTR(JSONCOMMANDKEY)].as<String>() == FPSTR(GETSCHEDULES) ){
+      debugprintcommand(GETSCHEDULES);
       Schedules.toJson(&response);
-      // File schedulejson = LittleFS.open("schedules.json","w");
-      // serializeJsonPretty(response,schedulejson);
-      // saveSchedules(&response);
-      response[JsonCommandKey] = "GetSchedules";
+      response[FPSTR(JSONCOMMANDKEY)] = FPSTR(GETSCHEDULES);
     }
 
-    else if(command[JsonCommandKey].as<String>() == DeleteAlert ){
-      Serial.printf("got \"%s\" \n", DeleteAlert);
-      String alertTime = command["Alert"];
-      String scheduleName = command["Schedule"];
-      response["Result"]= Schedules[scheduleName.c_str()]->removeAlert(alertTime.c_str());
-      saveSchedules(&response, SchedulesFile);
-
-      response[JsonCommandKey] = "DeleteAlertResponse";
+    else if(command[FPSTR(JSONCOMMANDKEY)].as<String>() == FPSTR(DELETEALERT)){
+      debugprintcommand(DELETEALERT);
+      String alertTime = command[FPSTR(ALERT)];
+      String scheduleName = command[FPSTR(SCHEDULE)];
+      response[FPSTR(RESULT)]= Schedules[scheduleName.c_str()]->removeAlert(alertTime.c_str());
+      if (response[FPSTR(RESULT)] == 1){
+        saveSchedules(&response, SchedulesFile);
+        response[FPSTR(JSONCOMMANDKEY)] = F("DeleteAlertSuccess");
+      } else{
+          response[FPSTR(JSONCOMMANDKEY)] = F("DeleteAlertError");
+          response[FPSTR(ALERTTIME)] = alertTime;
+          response[FPSTR(SCHEDULE)] = scheduleName;
+      }
     }
     
     // Add Alert To Schedule
-    else if(command[JsonCommandKey].as<String>() == AddAlert ){
-      Serial.printf("got \"%s\" \n", AddAlert);
+    else if(command[FPSTR(JSONCOMMANDKEY)].as<String>() == FPSTR(ADDALERT) ){
+      debugprintcommand(ADDALERT);
 
-      String scheduleName= command["Schedule"];
-      String AlertTime = command["AlertTime"];
-      response["Result"] = Schedules[scheduleName.c_str()]->addAlert(&AlertTime,15,AlertTone::SINGLE);
-      if(response["Result"] == 1){
+      String scheduleName= command[FPSTR(SCHEDULE)];
+      String AlertTime = command[FPSTR(ALERTTIME)];
+      response[FPSTR(RESULT)] = Schedules[scheduleName.c_str()]->addAlert(&AlertTime,15,AlertTone::SINGLE);
+      if(response[FPSTR(RESULT)] == 1){
         saveSchedules(&response, SchedulesFile);
-        response[JsonCommandKey] = "GetSchedules";
+        response[FPSTR(JSONCOMMANDKEY)] = FPSTR(GETSCHEDULES);
       } else{
-        response[JsonCommandKey] = "AddAlertError";
-        response["Schedule"] = scheduleName;
-        response["AlertTime"] = AlertTime;
+        response[FPSTR(JSONCOMMANDKEY)] = F("AddAlertError");
+        response[FPSTR(SCHEDULE)] = scheduleName;
+        response[FPSTR(ALERTTIME)] = AlertTime;
       }
       
 
       // Schedules.toJson(&scheduleName,&response);
     }
 
-    else if(command[JsonCommandKey].as<String>() == NewSchedule ){
-      String scheduleName = command["Name"].as<String>();
-      response["Result"] = Schedules.addSchedule( Schedule( scheduleName ) );
-      if(response["Result"] == 1){
+    else if(command[FPSTR(JSONCOMMANDKEY)].as<String>() == FPSTR(NEWSCHEDULE) ){
+     debugprintcommand(NEWSCHEDULE);
+
+      String scheduleName = command[FPSTR(NAME)].as<String>();
+      response[FPSTR(RESULT)] = Schedules.addSchedule( Schedule( scheduleName ) );
+      if(response[FPSTR(RESULT)] == 1){
         saveSchedules(&response, SchedulesFile);
-        response[JsonCommandKey] = "GetSchedules";
+        response[FPSTR(JSONCOMMANDKEY)] = FPSTR(GETSCHEDULES);
 
       } else{
-        response[JsonCommandKey] = "NewScheduleError";
-        response["Schedule"] = scheduleName;
+        response[FPSTR(JSONCOMMANDKEY)] = F("NewScheduleError");
+        response[FPSTR(SCHEDULE)] = scheduleName;
       }
 
     }
 
-    else if (command[JsonCommandKey].as<String>() == DeleteSchedule){
-      Serial.printf("Recieved %s:",DeleteSchedule);
-      String scheduleName = command["Name"].as<String>();
-      response["Result"] =  Schedules.DeleteSchedule(scheduleName.c_str());
-      if(response["Result"] == 1){
+    else if (command[FPSTR(JSONCOMMANDKEY)].as<String>() == FPSTR(DELETESCHEDULE)){
+      debugprintcommand(DELETESCHEDULE);
+      String scheduleName = command[FPSTR(NAME)].as<String>();
+      response[FPSTR(RESULT)] =  Schedules.DeleteSchedule(scheduleName.c_str());
+      if(response[FPSTR(RESULT)] == 1){
         saveSchedules(&response, SchedulesFile);
-        response[JsonCommandKey] = "GetSchedules";
+        response[FPSTR(JSONCOMMANDKEY)] = FPSTR(GETSCHEDULES);
       } else{
-        response[JsonCommandKey] = "DeleteScheduleError";
-        response["Schedule"] = scheduleName;
+        response[FPSTR(JSONCOMMANDKEY)] = F("DeleteScheduleError");
+        response[FPSTR(SCHEDULE)] = scheduleName;
       }
 
     }
@@ -169,21 +179,23 @@ void handlingIncomingData(void *arg, uint8_t *data, size_t len, AsyncWebSocketCl
     {// Create buffer for serialized json, and send to Websocket client 
       response.shrinkToFit();
       size_t bufferLength = measureJson(response)+1;
-      Serial.println("Creating buffer");
+      // Serial.println("Creating buffer");
       //creates buffer for sending datat through the websocket
       void *buffer = malloc(bufferLength);
       if (buffer){
-        Serial.println("Serealizing Json");
+        // Serial.println("Serealizing Json");
         serializeJson(response,buffer, bufferLength);
         if(client){
-          Serial.println("Sending Json");
+          // Serial.println("Sending Json");
           client->text((char *)buffer);
-          Serial.println("done sending json");
+          // Serial.println("done sending json");
         } else{
           ws.textAll((char *)buffer);
         }
       }
       free(buffer);
+      response.clear();
+      response.shrinkToFit();
     }
   }
 }
@@ -196,6 +208,7 @@ int saveSchedules(DynamicJsonDocument *json, const char* filename){
   schedulejson.close();
   return 1;
 }
+
 // Callback for incoming event
 void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, 
              void * arg, uint8_t *data, size_t len){
@@ -219,6 +232,10 @@ void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventTyp
    }
   
 }
+
+// Sets the asyncweb server to handle and serve files
+// This is wehere the static and event handlers are 
+// connected to the  webserver
 void setupServer(){
 
   ws.onEvent(onEvent);
