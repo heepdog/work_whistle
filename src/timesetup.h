@@ -2,9 +2,11 @@
 #include <time.h>                       // time() ctime()
 #include <sys/time.h>                   // struct timeval
 #include <coredecls.h>                  // settimeofday_cb()
+/*  Commented out because it is no longer needed for most recent platformio
+// _VOID _EXFUN(tzset,	(_VOID));
+// int	_EXFUN(setenv,(const char *__string, const char *__value, int __overwrite));
+*/
 
-_VOID _EXFUN(tzset,	(_VOID));
-int	_EXFUN(setenv,(const char *__string, const char *__value, int __overwrite));
 
 // TZ string setup
 // TZ string information:

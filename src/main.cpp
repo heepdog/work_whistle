@@ -159,7 +159,7 @@ void loop() {
   //for testing add alert 1 mins after starting
   if (cbtime_set && !addedTime){
 
-    char charAlert[6];
+    char charAlert[48];
     sprintf(charAlert,"%2d:%02d",tm_tm_now->tm_hour, tm_tm_now->tm_min+1);
     String alertingTime = charAlert;
     debug("adding " + alertingTime);
@@ -180,7 +180,7 @@ void loop() {
     Serial.printf("Char Time: %s\n",charTime);
     
     uint32_t free;
-    uint16_t max;
+    uint32_t max;
     uint8_t frag;
     ESP.getHeapStats(&free, &max, &frag);
 
